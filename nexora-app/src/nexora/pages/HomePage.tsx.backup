@@ -1,0 +1,642 @@
+import {
+  ArrowRight,
+  Gift,
+  History,
+  Plus,
+  TrendingUp,
+  Users,
+  WalletCards,
+} from "lucide-react";
+import type {
+  Activity,
+  Investment,
+  InvestmentPlan,
+  Page,
+  Wallet,
+} from "../types";
+import {
+  formatDate,
+  formatPercent,
+  money,
+  safeNumber,
+} from "../theme";
+import {
+  BalanceCard,
+  EmptyState,
+  FeatureIcon,
+  MenuItem,
+  SectionTitle,
+  StatCard,
+} from "../ui";
+
+type HomePageProps = {
+  wallet: Wallet | null;
+  plans: InvestmentPlan[];
+  investments: Investment[];
+  activities: Activity[];
+  onNavigate: (page: Page) => void;
+  onDeposit: () => void;
+};
+
+function getInvestmentAmount(
+  investment: Investment,
+): number {
+  return safeNumber(
+    investment.amount ??
+      investment.principal ??
+      0,
+  );
+}
+
+function getInvestmentProfit(
+  investment: Investment,
+): number {
+  if (
+    investment.expectedProfit !==
+    undefined
+  ) {
+    return safeNumber(
+      investment.expectedProfit,
+    );
+  }
+
+  if (
+    investment.profit !== undefined
+  ) {
+    return safeNumber(
+      investment.profit,
+    );
+  }
+
+  return 0;
+}
+
+function getInvestmentName(
+  investment: Investment,
+): string {
+  return (
+    investment.planName ||
+    "Nexora investment"
+  );
+}
+
+function getActivityAmount(
+  activity: Activity,
+): number {
+  return safeNumber(
+    activity.amount,
+  );
+}
+
+function getActivityTitle(
+  activity: Activity,
+): string {
+  if (activity.title) {
+    return activity.title;
+  }
+
+  switch (activity.type) {
+    case "deposit":
+      return "Deposit";
+
+    case "investment":
+      return "Investment";
+
+    case "earning":
+      return "Earning";
+
+    case "withdrawal":
+      return "Withdrawal";
+
+    case "referral":
+      return "Referral reward";
+
+    case "bonus":
+      return "Bonus";
+
+    default:
+      return "Account activity";
+  }
+}
+
+export default function HomePage({
+  wallet,
+  plans,
+  investments,
+  activities,
+  onNavigate,
+  onDeposit,
+}: HomePageProps) {
+  const currency =
+    wallet?.currency ?? "USDT";
+
+  const availableBalance =
+    wallet?.availableBalance ??
+    wallet?.balance ??
+    0;
+
+  const investedBalance =
+    wallet?.investedBalance ??
+    wallet?.totalInvested ??
+    0;
+
+  const totalEarnings =
+    wallet?.totalEarnings ?? 0;
+
+  const totalBalance =
+    availableBalance +
+    investedBalance;
+
+  const activeInvestments =
+    investments.filter(
+      (investment) => {
+        const status =
+          String(
+            investment.status,
+          ).toLowerCase();
+
+        return (
+          status === "active" ||
+          status === "running"
+        );
+      },
+    );
+
+  const featuredPlan =
+    plans.find(
+      (plan) =>
+        plan.isActive !== false,
+    ) ??
+    plans[0] ??
+    null;
+
+  const featuredRate =
+    featuredPlan?.dailyRate ??
+    featuredPlan?.rate ??
+    0;
+
+  const featuredDuration =
+    featuredPlan?.durationDays ??
+    featuredPlan?.duration ??
+    0;
+
+  const latestInvestment =
+    investments[0] ?? null;
+
+  return (
+    <div className="nx-page nx-home-page">
+      <section className="nx-home-hero">
+        <div className="nx-home-hero__copy">
+          <span className="nx-eyebrow">
+            NEXORA · GROW TOGETHER
+          </span>
+
+          <h1>
+            Your money.
+            <br />
+            Your next move.
+          </h1>
+
+          <p>
+            Explore investments, earn rewards,
+            and grow your network from one
+            simple Telegram experience.
+          </p>
+
+          <div className="nx-home-hero__actions">
+            <button
+              type="button"
+              className="nx-button nx-button--primary"
+              onClick={() =>
+                onNavigate("invest")
+              }
+            >
+              Start investing
+              <ArrowRight size={17} />
+            </button>
+
+            <button
+              type="button"
+              className="nx-button nx-button--secondary"
+              onClick={onDeposit}
+            >
+              <Plus size={17} />
+              Deposit
+            </button>
+          </div>
+        </div>
+
+        <div className="nx-home-hero__orb">
+          <div className="nx-home-hero__orb-inner">
+            <TrendingUp size={34} />
+          </div>
+        </div>
+      </section>
+
+      <section className="nx-home-balance">
+        <BalanceCard
+          label="Total portfolio"
+          amount={totalBalance}
+          currency={currency}
+          icon={<WalletCards size={19} />}
+          subtitle="Available + invested balance"
+        />
+      </section>
+
+      <section>
+        <div className="nx-stats-grid nx-stats-grid--three">
+          <StatCard
+            label="Available"
+            value={money(
+              availableBalance,
+              currency,
+            )}
+            icon={<WalletCards size={17} />}
+          />
+
+          <StatCard
+            label="Invested"
+            value={money(
+              investedBalance,
+              currency,
+            )}
+            icon={
+              <TrendingUp size={17} />
+            }
+          />
+
+          <StatCard
+            label="Earnings"
+            value={money(
+              totalEarnings,
+              currency,
+            )}
+            icon={<Gift size={17} />}
+          />
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Quick actions"
+          description="Move around Nexora faster"
+        />
+
+        <div className="nx-menu-list nx-menu-list--actions">
+          <MenuItem
+            icon={<Plus size={19} />}
+            title="Deposit"
+            description="Add demo funds to your wallet"
+            trailing={
+              <ArrowRight size={18} />
+            }
+            onClick={onDeposit}
+          />
+
+          <MenuItem
+            icon={
+              <TrendingUp size={19} />
+            }
+            title="Invest"
+            description="Choose a plan and start investing"
+            trailing={
+              <ArrowRight size={18} />
+            }
+            onClick={() =>
+              onNavigate("invest")
+            }
+          />
+
+          <MenuItem
+            icon={<Gift size={19} />}
+            title="Earn"
+            description="Complete activities for demo rewards"
+            trailing={
+              <ArrowRight size={18} />
+            }
+            onClick={() =>
+              onNavigate("earn")
+            }
+          />
+
+          <MenuItem
+            icon={<Users size={19} />}
+            title="Friends"
+            description="Invite people and grow your network"
+            trailing={
+              <ArrowRight size={18} />
+            }
+            onClick={() =>
+              onNavigate("friends")
+            }
+          />
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Featured plan"
+          description="A quick look at the current demo plan"
+          action="View all"
+          onAction={() =>
+            onNavigate("invest")
+          }
+        />
+
+        {featuredPlan ? (
+          <button
+            type="button"
+            className="nx-featured-plan"
+            onClick={() =>
+              onNavigate("invest")
+            }
+          >
+            <div className="nx-featured-plan__icon">
+              <FeatureIcon
+                icon={
+                  <TrendingUp size={21} />
+                }
+                tone="accent"
+              />
+            </div>
+
+            <div className="nx-featured-plan__content">
+              <div className="nx-featured-plan__top">
+                <strong>
+                  {featuredPlan.name}
+                </strong>
+
+                <span>
+                  {formatPercent(
+                    featuredRate,
+                  )}
+                </span>
+              </div>
+
+              <p>
+                {featuredPlan.description ??
+                  "Flexible demo investment plan."}
+              </p>
+
+              <div className="nx-featured-plan__meta">
+                <span>
+                  {featuredDuration} days
+                </span>
+
+                <span>
+                  From{" "}
+                  {money(
+                    featuredPlan.minAmount,
+                    featuredPlan.currency ??
+                      currency,
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <ArrowRight size={19} />
+          </button>
+        ) : (
+          <EmptyState
+            icon={
+              <TrendingUp size={24} />
+            }
+            title="Plans coming soon"
+            description="Investment plans will appear here when they are available."
+          />
+        )}
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Active investment"
+          description="Your latest position"
+          action={
+            latestInvestment
+              ? "View all"
+              : undefined
+          }
+          onAction={
+            latestInvestment
+              ? () =>
+                  onNavigate("invest")
+              : undefined
+          }
+        />
+
+        {latestInvestment ? (
+          <div className="nx-home-investment-card">
+            <div className="nx-home-investment-card__header">
+              <div>
+                <span className="nx-eyebrow">
+                  {activeInvestments.length >
+                  0
+                    ? "ACTIVE"
+                    : "LATEST"}
+                </span>
+
+                <h3>
+                  {getInvestmentName(
+                    latestInvestment,
+                  )}
+                </h3>
+              </div>
+
+              <TrendingUp size={20} />
+            </div>
+
+            <div className="nx-home-investment-card__main">
+              <div>
+                <span>
+                  Principal
+                </span>
+
+                <strong>
+                  {money(
+                    getInvestmentAmount(
+                      latestInvestment,
+                    ),
+                    latestInvestment.currency ??
+                      currency,
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  Estimated profit
+                </span>
+
+                <strong>
+                  {money(
+                    getInvestmentProfit(
+                      latestInvestment,
+                    ),
+                    latestInvestment.currency ??
+                      currency,
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="nx-text-button"
+              onClick={() =>
+                onNavigate("invest")
+              }
+            >
+              Open investments
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        ) : (
+          <EmptyState
+            icon={
+              <TrendingUp size={24} />
+            }
+            title="No investments yet"
+            description="Start with a demo investment plan when you're ready."
+            actionLabel="Explore plans"
+            onAction={() =>
+              onNavigate("invest")
+            }
+          />
+        )}
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Recent activity"
+          description="Latest account activity"
+          action={
+            activities.length > 0
+              ? "View"
+              : undefined
+          }
+          onAction={() =>
+            onNavigate("account")
+          }
+        />
+
+        {activities.length === 0 ? (
+          <EmptyState
+            icon={<History size={24} />}
+            title="No recent activity"
+            description="Your deposits, investments, earnings, and withdrawals will appear here."
+          />
+        ) : (
+          <div className="nx-activity-list">
+            {activities
+              .slice(0, 5)
+              .map((activity) => (
+                <div
+                  key={activity.id}
+                  className="nx-activity-item"
+                >
+                  <div className="nx-activity-item__icon">
+                    {activity.type ===
+                    "deposit" ? (
+                      <Plus size={17} />
+                    ) : activity.type ===
+                      "investment" ? (
+                      <TrendingUp
+                        size={17}
+                      />
+                    ) : activity.type ===
+                      "earning" ? (
+                      <Gift size={17} />
+                    ) : (
+                      <History size={17} />
+                    )}
+                  </div>
+
+                  <div className="nx-activity-item__content">
+                    <strong>
+                      {getActivityTitle(
+                        activity,
+                      )}
+                    </strong>
+
+                    <span>
+                      {activity.description ??
+                        activity.status ??
+                        "Account activity"}
+                    </span>
+                  </div>
+
+                  <div className="nx-activity-item__amount">
+                    {activity.amount !==
+                    undefined ? (
+                      <strong>
+                        {money(
+                          getActivityAmount(
+                            activity,
+                          ),
+                          activity.currency ??
+                            currency,
+                        )}
+                      </strong>
+                    ) : null}
+
+                    {activity.createdAt ? (
+                      <small>
+                        {formatDate(
+                          activity.createdAt,
+                        )}
+                      </small>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+      </section>
+
+      <section className="nx-home-cta">
+        <div>
+          <span className="nx-eyebrow">
+            GROW TOGETHER
+          </span>
+
+          <h2>
+            Build your Nexora journey.
+          </h2>
+
+          <p>
+            Invest, earn, and invite friends
+            from one place.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="nx-button nx-button--primary"
+          onClick={() =>
+            onNavigate("friends")
+          }
+        >
+          Invite friends
+          <Users size={17} />
+        </button>
+      </section>
+
+      <div className="nx-demo-notice">
+        <WalletCards size={17} />
+
+        <div>
+          <strong>
+            Nexora demo environment
+          </strong>
+
+          <p>
+            Balances, investments, earnings,
+            and projected returns shown in this
+            application are for demonstration
+            purposes.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

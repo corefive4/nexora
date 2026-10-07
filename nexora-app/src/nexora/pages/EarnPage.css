@@ -1,0 +1,1201 @@
+/* =========================================================
+   NEXORA EARN — FOUNDATION
+   ========================================================= */
+
+.nx-earn {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: #eef4ff;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(38,184,255,.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 20%,
+      rgba(184,245,42,.045),
+      transparent 28%
+    ),
+    #040b1b;
+  font-family: inherit;
+}
+
+.nx-earn *,
+.nx-earn *::before,
+.nx-earn *::after {
+  box-sizing: border-box;
+}
+
+.nx-earn-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.nx-earn-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: .38;
+  animation: nxEarnFloat 12s ease-in-out infinite;
+}
+
+.nx-earn-orb-one {
+  width: 210px;
+  height: 210px;
+  top: -90px;
+  left: -70px;
+  background: rgba(38,184,255,.12);
+}
+
+.nx-earn-orb-two {
+  width: 190px;
+  height: 190px;
+  top: 34%;
+  right: -95px;
+  background: rgba(122,72,255,.10);
+  animation-delay: -4s;
+}
+
+.nx-earn-orb-three {
+  width: 170px;
+  height: 170px;
+  bottom: -70px;
+  left: 24%;
+  background: rgba(184,245,42,.07);
+  animation-delay: -8s;
+}
+
+.nx-earn-grid {
+  position: absolute;
+  inset: 0;
+  opacity: .22;
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.022) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.022) 1px,
+      transparent 1px
+    );
+  background-size: 42px 42px;
+  mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 78%
+  );
+}
+
+.nx-earn-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 17px 16px 24px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.nx-earn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nx-earn-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.nx-earn-brand-mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #07101f;
+  background:
+    linear-gradient(
+      135deg,
+      #31c8ff 0%,
+      #5db9ff 48%,
+      #b8f52a 100%
+    );
+  box-shadow:
+    0 8px 24px rgba(38,184,255,.18),
+    inset 0 1px rgba(255,255,255,.55);
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: -1px;
+}
+
+.nx-earn-brand strong,
+.nx-earn-brand small {
+  display: block;
+}
+
+.nx-earn-brand strong {
+  color: #f6f9ff;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  line-height: 1.1;
+}
+
+.nx-earn-brand small {
+  margin-top: 3px;
+  color: #667691;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1.35px;
+}
+
+.nx-earn-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid rgba(184,245,42,.12);
+  border-radius: 999px;
+  color: #9bb08a;
+  background: rgba(184,245,42,.045);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.1px;
+}
+
+.nx-earn-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b8f52a;
+  box-shadow: 0 0 10px rgba(184,245,42,.75);
+  animation: nxEarnPulse 2s ease-in-out infinite;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.nx-earn-hero {
+  position: relative;
+  min-height: 205px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+  padding: 22px 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      circle at 82% 50%,
+      rgba(38,184,255,.11),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(184,245,42,.06),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(16,31,60,.94),
+      rgba(7,16,34,.96)
+    );
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.25),
+    inset 0 1px rgba(255,255,255,.035);
+}
+
+.nx-earn-hero::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(38,184,255,.10);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 26px rgba(38,184,255,.018),
+    0 0 0 56px rgba(38,184,255,.012);
+  pointer-events: none;
+}
+
+.nx-earn-hero-copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  max-width: 420px;
+}
+
+.nx-earn-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #5ed0ff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 1.8px;
+}
+
+.nx-earn-eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: #5ed0ff;
+  box-shadow: 0 0 8px rgba(94,208,255,.5);
+}
+
+.nx-earn-hero h1 {
+  margin: 9px 0 0;
+  color: #f6f9ff;
+  font-size: clamp(29px, 7vw, 39px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -1.7px;
+}
+
+.nx-earn-hero h1 em {
+  color: #b8f52a;
+  font-style: normal;
+}
+
+.nx-earn-hero p {
+  max-width: 365px;
+  margin: 12px 0 0;
+  color: #8190a9;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.nx-earn-hero-orbit {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  flex: 0 0 132px;
+  display: grid;
+  place-items: center;
+}
+
+.nx-earn-orbit-ring {
+  position: absolute;
+  width: 112px;
+  height: 112px;
+  border: 1px solid rgba(38,184,255,.18);
+  border-radius: 50%;
+  animation: nxEarnSpin 18s linear infinite;
+}
+
+.nx-earn-orbit-ring::before {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  top: 9px;
+  left: 15px;
+  border-radius: 50%;
+  background: #5ed0ff;
+  box-shadow: 0 0 12px rgba(94,208,255,.8);
+}
+
+.nx-earn-orbit-ring.is-two {
+  width: 82px;
+  height: 82px;
+  border-color: rgba(184,245,42,.16);
+  animation-direction: reverse;
+  animation-duration: 12s;
+}
+
+.nx-earn-orbit-ring.is-two::before {
+  top: auto;
+  left: auto;
+  right: 5px;
+  bottom: 13px;
+  background: #b8f52a;
+  box-shadow: 0 0 12px rgba(184,245,42,.8);
+}
+
+.nx-earn-coin {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  color: #d8ff7b;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(184,245,42,.15),
+      rgba(38,184,255,.10)
+    );
+  border: 1px solid rgba(184,245,42,.18);
+  box-shadow:
+    0 0 35px rgba(184,245,42,.08),
+    inset 0 1px rgba(255,255,255,.06);
+}
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
+.nx-earn-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.nx-earn-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 19px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.014)
+    ),
+    rgba(7,16,35,.84);
+  box-shadow: 0 12px 32px rgba(0,0,0,.13);
+}
+
+.nx-earn-summary-icon {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.nx-earn-summary-icon.is-lime {
+  color: #b8f52a;
+  background: rgba(184,245,42,.09);
+  border: 1px solid rgba(184,245,42,.10);
+}
+
+.nx-earn-summary-icon.is-blue {
+  color: #5ed0ff;
+  background: rgba(38,184,255,.09);
+  border: 1px solid rgba(38,184,255,.10);
+}
+
+.nx-earn-summary-card span {
+  display: block;
+  color: #64738d;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.nx-earn-summary-card strong {
+  display: block;
+  margin-top: 3px;
+  color: #f3f7ff;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.nx-earn-section {
+  margin-top: 30px;
+}
+
+.nx-earn-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.nx-earn-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #63728b;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.55px;
+}
+
+.nx-earn-section-head h2 {
+  margin: 0;
+  color: #f3f7ff;
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -.5px;
+}
+
+.nx-earn-count {
+  padding: 6px 9px;
+  border: 1px solid rgba(184,245,42,.10);
+  border-radius: 999px;
+  color: #9eaf8d;
+  background: rgba(184,245,42,.035);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   TASK CARDS
+   ========================================================= */
+
+.nx-earn-task-list {
+  display: grid;
+  gap: 10px;
+}
+
+.nx-earn-task {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 21px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.014)
+    ),
+    rgba(7,16,35,.82);
+  box-shadow: 0 14px 38px rgba(0,0,0,.15);
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.nx-earn-task::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 13px;
+  bottom: 13px;
+  width: 2px;
+  border-radius: 2px;
+  background: #5ed0ff;
+  opacity: .8;
+}
+
+.nx-earn-task.is-lime::before {
+  background: #b8f52a;
+}
+
+.nx-earn-task.is-violet::before {
+  background: #a87cff;
+}
+
+.nx-earn-task.is-gold::before {
+  background: #ffd56a;
+}
+
+.nx-earn-task:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.10);
+}
+
+.nx-earn-task-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #5ed0ff;
+  background: rgba(38,184,255,.08);
+  border: 1px solid rgba(38,184,255,.09);
+}
+
+.nx-earn-task.is-lime .nx-earn-task-icon {
+  color: #b8f52a;
+  background: rgba(184,245,42,.08);
+  border-color: rgba(184,245,42,.09);
+}
+
+.nx-earn-task.is-violet .nx-earn-task-icon {
+  color: #ad86ff;
+  background: rgba(154,106,255,.08);
+  border-color: rgba(154,106,255,.10);
+}
+
+.nx-earn-task.is-gold .nx-earn-task-icon {
+  color: #ffd56a;
+  background: rgba(255,213,106,.08);
+  border-color: rgba(255,213,106,.09);
+}
+
+.nx-earn-task-body {
+  min-width: 0;
+}
+
+.nx-earn-task-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nx-earn-task-top span {
+  color: #64748d;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+
+.nx-earn-task-top strong {
+  color: #b8f52a;
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.nx-earn-task h3 {
+  margin: 4px 0 0;
+  color: #edf3fc;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nx-earn-task p {
+  margin: 4px 0 0;
+  color: #718098;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.nx-earn-claim {
+  min-width: 58px;
+  padding: 9px 10px;
+  border: 1px solid rgba(184,245,42,.15);
+  border-radius: 12px;
+  color: #caff5e;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(184,245,42,.13),
+      rgba(184,245,42,.045)
+    );
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  transition:
+    transform .18s ease,
+    background .18s ease;
+}
+
+.nx-earn-claim:hover {
+  background: rgba(184,245,42,.17);
+}
+
+.nx-earn-claim:active {
+  transform: scale(.95);
+}
+
+.nx-earn-claim:disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.nx-earn-empty {
+  padding: 30px 18px;
+  text-align: center;
+  border: 1px dashed rgba(255,255,255,.08);
+  border-radius: 22px;
+  background: rgba(255,255,255,.015);
+}
+
+.nx-earn-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #b8f52a;
+  background: rgba(184,245,42,.07);
+  border: 1px solid rgba(184,245,42,.09);
+}
+
+.nx-earn-empty strong {
+  color: #eaf1fb;
+  font-size: 14px;
+}
+
+.nx-earn-empty p {
+  max-width: 260px;
+  margin: 6px auto 15px;
+  color: #6e7d96;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.nx-earn-empty button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border: 1px solid rgba(38,184,255,.13);
+  border-radius: 11px;
+  color: #70d6ff;
+  background: rgba(38,184,255,.06);
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   FEATURE BANNER
+   ========================================================= */
+
+.nx-earn-feature {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 28px;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid rgba(184,245,42,.12);
+  border-radius: 23px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(184,245,42,.10),
+      transparent 36%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(27,39,48,.92),
+      rgba(9,19,35,.96)
+    );
+}
+
+.nx-earn-feature-glow {
+  position: absolute;
+  right: -55px;
+  bottom: -75px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(184,245,42,.08);
+  filter: blur(28px);
+}
+
+.nx-earn-feature-icon {
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #c9ff5e;
+  background: rgba(184,245,42,.09);
+  border: 1px solid rgba(184,245,42,.12);
+}
+
+.nx-earn-feature-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-earn-feature-copy span {
+  color: #9daf87;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1.45px;
+}
+
+.nx-earn-feature-copy h2 {
+  margin: 3px 0 0;
+  color: #f2f7ff;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.nx-earn-feature-copy p {
+  margin: 4px 0 0;
+  color: #77859d;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.nx-earn-feature > button {
+  position: relative;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 50%;
+  color: #eef4ff;
+  background: rgba(255,255,255,.045);
+  cursor: pointer;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes nxEarnFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(10px, -15px, 0);
+  }
+}
+
+@keyframes nxEarnPulse {
+  0%,
+  100% {
+    opacity: .55;
+    transform: scale(.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes nxEarnSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   HOW IT WORKS
+   ========================================================= */
+
+.nx-earn-steps {
+  display: grid;
+  gap: 8px;
+}
+
+.nx-earn-step {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 17px;
+  background: rgba(8,17,36,.68);
+}
+
+.nx-earn-step > span {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #6b7b95;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.05);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+
+.nx-earn-step strong {
+  display: block;
+  color: #e7eef9;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.nx-earn-step p {
+  margin: 3px 0 0;
+  color: #697890;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   CLAIMED REWARDS
+   ========================================================= */
+
+.nx-earn-claimed-list {
+  display: grid;
+  gap: 7px;
+}
+
+.nx-earn-claimed {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 16px;
+  background: rgba(8,17,36,.66);
+}
+
+.nx-earn-claimed-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #b8f52a;
+  background: rgba(184,245,42,.07);
+  border: 1px solid rgba(184,245,42,.08);
+}
+
+.nx-earn-claimed div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-earn-claimed strong,
+.nx-earn-claimed span {
+  display: block;
+}
+
+.nx-earn-claimed strong {
+  overflow: hidden;
+  color: #dce6f4;
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nx-earn-claimed span {
+  margin-top: 3px;
+  color: #65748d;
+  font-size: 8px;
+}
+
+.nx-earn-claimed b {
+  color: #b8f52a;
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PROGRAM NOTE
+   ========================================================= */
+
+.nx-earn-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 13px;
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: 17px;
+  background: rgba(255,255,255,.018);
+}
+
+.nx-earn-note-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: #8fa0b9;
+  background: rgba(255,255,255,.035);
+}
+
+.nx-earn-note strong {
+  display: block;
+  color: #c4d0df;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.nx-earn-note p {
+  margin: 3px 0 0;
+  color: #5f6d85;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BOTTOM NAVIGATION
+   ========================================================= */
+
+.nx-earn-bottom-nav {
+  position: sticky;
+  bottom: 10px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  margin: 32px 0 7px;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 22px;
+  background: rgba(5,13,29,.90);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow:
+    0 16px 48px rgba(0,0,0,.34),
+    inset 0 1px rgba(255,255,255,.025);
+}
+
+.nx-earn-bottom-nav button {
+  min-width: 0;
+  min-height: 49px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 2px;
+  border: 0;
+  border-radius: 15px;
+  color: #5f6e87;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 750;
+  transition:
+    color .2s ease,
+    background .2s ease,
+    transform .2s ease;
+}
+
+.nx-earn-bottom-nav button span {
+  display: grid;
+  place-items: center;
+  min-height: 16px;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.nx-earn-bottom-nav button:hover {
+  color: #aab8ca;
+  background: rgba(255,255,255,.035);
+}
+
+.nx-earn-bottom-nav button:active {
+  transform: scale(.95);
+}
+
+.nx-earn-bottom-nav button.is-active {
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(38,184,255,.12),
+      rgba(184,245,42,.065)
+    );
+}
+
+.nx-earn-bottom-nav button.is-active svg {
+  color: #b8f52a;
+}
+
+/* =========================================================
+   FOCUS STATES
+   ========================================================= */
+
+.nx-earn button:focus-visible {
+  outline: 2px solid rgba(94,208,255,.75);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 430px) {
+  .nx-earn-hero {
+    min-height: 215px;
+  }
+
+  .nx-earn-hero-orbit {
+    width: 105px;
+    height: 105px;
+    flex-basis: 105px;
+  }
+
+  .nx-earn-orbit-ring {
+    width: 91px;
+    height: 91px;
+  }
+
+  .nx-earn-orbit-ring.is-two {
+    width: 68px;
+    height: 68px;
+  }
+
+  .nx-earn-coin {
+    width: 50px;
+    height: 50px;
+    border-radius: 17px;
+  }
+
+  .nx-earn-hero h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 370px) {
+  .nx-earn-shell {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .nx-earn-hero {
+    min-height: 225px;
+    padding: 19px 16px;
+  }
+
+  .nx-earn-hero-orbit {
+    display: none;
+  }
+
+  .nx-earn-summary-card {
+    padding: 12px 11px;
+  }
+
+  .nx-earn-summary-icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+  }
+
+  .nx-earn-task {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .nx-earn-task-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .nx-earn-claim {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -2px;
+  }
+}
+
+@media (min-width: 640px) {
+  .nx-earn-shell {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .nx-earn-hero {
+    padding: 27px 26px;
+  }
+
+  .nx-earn-task-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nx-earn-task {
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .nx-earn-task .nx-earn-claim {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 2px;
+  }
+
+  .nx-earn-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .nx-earn-step {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .nx-earn-bottom-nav {
+    bottom: 18px;
+  }
+}
+
+@media (min-width: 900px) {
+  .nx-earn-shell {
+    max-width: 980px;
+  }
+
+  .nx-earn-main-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 20px;
+  }
+
+  .nx-earn-bottom-nav {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-earn *,
+  .nx-earn *::before,
+  .nx-earn *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

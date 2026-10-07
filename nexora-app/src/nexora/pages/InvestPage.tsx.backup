@@ -1,0 +1,814 @@
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  Info,
+  LockKeyhole,
+  ShieldCheck,
+  TrendingUp,
+  WalletCards,
+} from "lucide-react";
+import {
+  useMemo,
+  useState,
+} from "react";
+import type {
+  Investment,
+  InvestmentPlan,
+  Page,
+  Wallet,
+} from "../types";
+import {
+  calculateProfit,
+  calculateReturn,
+  formatDate,
+  formatPercent,
+  money,
+  safeNumber,
+} from "../theme";
+import {
+  CalculationRow,
+  EmptyState,
+  InvestmentStatus,
+  PlanRate,
+  SectionTitle,
+} from "../ui";
+
+type InvestPageProps = {
+  plans: InvestmentPlan[];
+  wallet: Wallet | null;
+  investments: Investment[];
+  onNavigate: (page: Page) => void;
+  onInvest: (
+    planId: string,
+    amount: number,
+  ) => Promise<Investment | null>;
+};
+
+function getPlanRate(
+  plan: InvestmentPlan,
+): number {
+  return plan.dailyRate || plan.rate || 0;
+}
+
+function getPlanDuration(
+  plan: InvestmentPlan,
+): number {
+  return (
+    plan.durationDays ||
+    plan.duration ||
+    0
+  );
+}
+
+function getPlanMin(
+  plan: InvestmentPlan,
+): number {
+  return safeNumber(plan.minAmount);
+}
+
+function getPlanMax(
+  plan: InvestmentPlan,
+): number | null {
+  if (
+    plan.maxAmount === null ||
+    plan.maxAmount === undefined
+  ) {
+    return null;
+  }
+
+  const value = safeNumber(
+    plan.maxAmount,
+  );
+
+  return value > 0 ? value : null;
+}
+
+function getInvestmentAmount(
+  investment: Investment,
+): number {
+  return (
+    investment.amount ??
+    investment.principal ??
+    0
+  );
+}
+
+function getInvestmentProfit(
+  investment: Investment,
+): number {
+  if (
+    investment.expectedProfit !==
+    undefined
+  ) {
+    return investment.expectedProfit;
+  }
+
+  if (
+    investment.profit !== undefined
+  ) {
+    return investment.profit;
+  }
+
+  const amount =
+    getInvestmentAmount(investment);
+
+  const rate =
+    investment.dailyRate ??
+    investment.rate ??
+    0;
+
+  const duration =
+    investment.durationDays ??
+    investment.duration ??
+    0;
+
+  return calculateProfit(
+    amount,
+    rate,
+    duration,
+  );
+}
+
+function getInvestmentReturn(
+  investment: Investment,
+): number {
+  if (
+    investment.totalReturn !==
+    undefined
+  ) {
+    return investment.totalReturn;
+  }
+
+  if (
+    investment.expectedReturn !==
+    undefined
+  ) {
+    return investment.expectedReturn;
+  }
+
+  if (
+    investment.returnAmount !==
+    undefined
+  ) {
+    return investment.returnAmount;
+  }
+
+  return (
+    getInvestmentAmount(
+      investment,
+    ) +
+    getInvestmentProfit(investment)
+  );
+}
+
+function getInvestmentName(
+  investment: Investment,
+): string {
+  return (
+    investment.planName ||
+    "Nexora investment"
+  );
+}
+
+function getInvestmentMaturity(
+  investment: Investment,
+): string | undefined {
+  return (
+    investment.maturityAt ||
+    investment.endDate
+  );
+}
+
+export default function InvestPage({
+  plans,
+  wallet,
+  investments,
+  onNavigate,
+  onInvest,
+}: InvestPageProps) {
+  const activePlans =
+    plans.filter(
+      (plan) =>
+        plan.isActive !== false,
+    );
+
+  const [selectedPlanId, setSelectedPlanId] =
+    useState<string>(
+      activePlans[0]?.id ?? "",
+    );
+
+  const [amountText, setAmountText] =
+    useState<string>("");
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const selectedPlan =
+    activePlans.find(
+      (plan) =>
+        plan.id === selectedPlanId,
+    ) ??
+    activePlans[0] ??
+    null;
+
+  const amount =
+    safeNumber(amountText);
+
+  const availableBalance =
+    wallet?.availableBalance ??
+    wallet?.balance ??
+    0;
+
+  const currency =
+    selectedPlan?.currency ??
+    wallet?.currency ??
+    "USDT";
+
+  const dailyRate = selectedPlan
+    ? getPlanRate(selectedPlan)
+    : 0;
+
+  const durationDays = selectedPlan
+    ? getPlanDuration(selectedPlan)
+    : 0;
+
+  const minimum =
+    selectedPlan
+      ? getPlanMin(selectedPlan)
+      : 0;
+
+  const maximum =
+    selectedPlan
+      ? getPlanMax(selectedPlan)
+      : null;
+
+  const estimatedProfit =
+    selectedPlan
+      ? calculateProfit(
+          amount,
+          dailyRate,
+          durationDays,
+        )
+      : 0;
+
+  const estimatedReturn =
+    selectedPlan
+      ? calculateReturn(
+          amount,
+          dailyRate,
+          durationDays,
+        )
+      : 0;
+
+  const amountError = useMemo(() => {
+    if (!amountText) {
+      return "";
+    }
+
+    if (!Number.isFinite(amount)) {
+      return "Enter a valid amount.";
+    }
+
+    if (amount <= 0) {
+      return "Amount must be greater than zero.";
+    }
+
+    if (
+      minimum > 0 &&
+      amount < minimum
+    ) {
+      return `Minimum investment is ${money(
+        minimum,
+        currency,
+      )}.`;
+    }
+
+    if (
+      maximum !== null &&
+      amount > maximum
+    ) {
+      return `Maximum investment is ${money(
+        maximum,
+        currency,
+      )}.`;
+    }
+
+    if (
+      amount > availableBalance
+    ) {
+      return "Amount exceeds your available balance.";
+    }
+
+    return "";
+  }, [
+    amount,
+    amountText,
+    availableBalance,
+    currency,
+    maximum,
+    minimum,
+  ]);
+
+  const canInvest =
+    Boolean(selectedPlan) &&
+    amount > 0 &&
+    !amountError &&
+    !submitting;
+
+  const handleInvest = async () => {
+    if (!selectedPlan) {
+      return;
+    }
+
+    if (!canInvest) {
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await onInvest(
+        selectedPlan.id,
+        amount,
+      );
+
+      setAmountText("");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="nx-page nx-invest-page">
+      <section className="nx-invest-hero">
+        <div className="nx-invest-hero__content">
+          <span className="nx-eyebrow">
+            NEXORA INVEST
+          </span>
+
+          <h1>
+            Put your balance to work.
+          </h1>
+
+          <p>
+            Choose a demo plan, enter an
+            amount, and preview the projected
+            return.
+          </p>
+        </div>
+
+        <div className="nx-invest-hero__balance">
+          <WalletCards size={19} />
+
+          <div>
+            <span>
+              Available balance
+            </span>
+
+            <strong>
+              {money(
+                availableBalance,
+                wallet?.currency ??
+                  "USDT",
+              )}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Investment plans"
+          description="Choose the plan that fits your demo balance"
+        />
+
+        {activePlans.length === 0 ? (
+          <EmptyState
+            icon={<Info size={25} />}
+            title="No plans available"
+            description="Investment plans are not available right now."
+            actionLabel="Back home"
+            onAction={() =>
+              onNavigate("home")
+            }
+          />
+        ) : (
+          <div className="nx-plan-grid">
+            {activePlans.map(
+              (plan) => {
+                const selected =
+                  plan.id ===
+                  selectedPlan?.id;
+
+                const rate =
+                  getPlanRate(plan);
+
+                const duration =
+                  getPlanDuration(plan);
+
+                const min =
+                  getPlanMin(plan);
+
+                const max =
+                  getPlanMax(plan);
+
+                return (
+                  <button
+                    key={plan.id}
+                    type="button"
+                    className={`nx-plan-card ${
+                      selected
+                        ? "is-selected"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedPlanId(
+                        plan.id,
+                      );
+                      setAmountText("");
+                    }}
+                  >
+                    <div className="nx-plan-card__top">
+                      <div>
+                        <span className="nx-plan-card__name">
+                          {plan.name}
+                        </span>
+
+                        {plan.description ? (
+                          <p>
+                            {
+                              plan.description
+                            }
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {selected ? (
+                        <CheckCircle2
+                          size={20}
+                        />
+                      ) : null}
+                    </div>
+
+                    <PlanRate
+                      rate={Number(rate)}
+                    />
+
+                    <div className="nx-plan-card__details">
+                      <span>
+                        <Clock3
+                          size={15}
+                        />
+                        {duration} days
+                      </span>
+
+                      <span>
+                        {money(
+                          min,
+                          currency,
+                        )}
+                        {max !== null
+                          ? ` – ${money(
+                              max,
+                              currency,
+                            )}`
+                          : "+"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              },
+            )}
+          </div>
+        )}
+      </section>
+
+      {selectedPlan ? (
+        <>
+          <section className="nx-invest-form">
+            <SectionTitle
+              title="Investment amount"
+              description={`Enter between ${money(
+                minimum,
+                currency,
+              )} and ${
+                maximum !== null
+                  ? money(
+                      maximum,
+                      currency,
+                    )
+                  : "no maximum"
+              }`}
+            />
+
+            <div
+              className={`nx-amount-input ${
+                amountError
+                  ? "has-error"
+                  : ""
+              }`}
+            >
+              <input
+                type="number"
+                inputMode="decimal"
+                min={minimum || undefined}
+                max={
+                  maximum ??
+                  undefined
+                }
+                step="0.01"
+                value={amountText}
+                onChange={(event) =>
+                  setAmountText(
+                    event.target.value,
+                  )
+                }
+                placeholder="0.00"
+                aria-label="Investment amount"
+              />
+
+              <span>{currency}</span>
+            </div>
+
+            {amountError ? (
+              <p className="nx-form-error">
+                {amountError}
+              </p>
+            ) : null}
+
+            <div className="nx-amount-shortcuts">
+              {[25, 50, 100].map(
+                (value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() =>
+                      setAmountText(
+                        String(
+                          Math.min(
+                            value,
+                            maximum ??
+                              value,
+                          ),
+                        ),
+                      )
+                    }
+                  >
+                    {value} {currency}
+                  </button>
+                ),
+              )}
+            </div>
+          </section>
+
+          <section className="nx-calculation-card">
+            <div className="nx-calculation-card__header">
+              <div>
+                <span className="nx-eyebrow">
+                  PROJECTED RESULT
+                </span>
+
+                <h2>
+                  Investment summary
+                </h2>
+              </div>
+
+              <TrendingUp size={22} />
+            </div>
+
+            <div className="nx-calculation-list">
+              <CalculationRow
+                label="Investment"
+                value={money(
+                  amount,
+                  currency,
+                )}
+              />
+
+              <CalculationRow
+                label="Daily rate"
+                value={formatPercent(
+                  dailyRate,
+                )}
+              />
+
+              <CalculationRow
+                label="Duration"
+                value={`${durationDays} days`}
+              />
+
+              <CalculationRow
+                label="Estimated profit"
+                value={money(
+                  estimatedProfit,
+                  currency,
+                )}
+                highlight
+              />
+
+              <CalculationRow
+                label="Estimated total return"
+                value={money(
+                  estimatedReturn,
+                  currency,
+                )}
+                highlight
+              />
+            </div>
+          </section>
+
+          <button
+            type="button"
+            className="nx-button nx-button--primary nx-invest-submit"
+            disabled={!canInvest}
+            onClick={() =>
+              void handleInvest()
+            }
+          >
+            {submitting
+              ? "Creating investment…"
+              : "Start demo investment"}
+
+            {!submitting ? (
+              <ArrowRight size={18} />
+            ) : null}
+          </button>
+        </>
+      ) : null}
+
+      <section>
+        <SectionTitle
+          title="Your investments"
+          description="Track your current demo positions"
+        />
+
+        {investments.length === 0 ? (
+          <EmptyState
+            icon={
+              <TrendingUp size={25} />
+            }
+            title="No investments yet"
+            description="Your active investments will appear here after you create one."
+          />
+        ) : (
+          <div className="nx-investment-list">
+            {investments.map(
+              (investment) => {
+                const investmentAmount =
+                  getInvestmentAmount(
+                    investment,
+                  );
+
+                const profit =
+                  getInvestmentProfit(
+                    investment,
+                  );
+
+                const totalReturn =
+                  getInvestmentReturn(
+                    investment,
+                  );
+
+                const maturity =
+                  getInvestmentMaturity(
+                    investment,
+                  );
+
+                return (
+                  <div
+                    key={investment.id}
+                    className="nx-investment-card"
+                  >
+                    <div className="nx-investment-card__top">
+                      <div>
+                        <span className="nx-eyebrow">
+                          INVESTMENT
+                        </span>
+
+                        <h3>
+                          {getInvestmentName(
+                            investment,
+                          )}
+                        </h3>
+                      </div>
+
+                      <InvestmentStatus
+                        status={
+                          investment.status
+                        }
+                      />
+                    </div>
+
+                    <div className="nx-investment-card__amount">
+                      <span>
+                        Principal
+                      </span>
+
+                      <strong>
+                        {money(
+                          investmentAmount,
+                          investment.currency ??
+                            currency,
+                        )}
+                      </strong>
+                    </div>
+
+                    <div className="nx-investment-card__stats">
+                      <div>
+                        <span>
+                          Profit
+                        </span>
+                        <strong>
+                          {money(
+                            profit,
+                            investment.currency ??
+                              currency,
+                          )}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Total return
+                        </span>
+                        <strong>
+                          {money(
+                            totalReturn,
+                            investment.currency ??
+                              currency,
+                          )}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Matures
+                        </span>
+                        <strong>
+                          {formatDate(
+                            maturity,
+                          )}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                );
+              },
+            )}
+          </div>
+        )}
+      </section>
+
+      <section className="nx-security-grid">
+        <div className="nx-security-card">
+          <ShieldCheck size={20} />
+
+          <div>
+            <strong>
+              Protected flow
+            </strong>
+
+            <p>
+              Investments are validated by
+              the Nexora backend before being
+              recorded.
+            </p>
+          </div>
+        </div>
+
+        <div className="nx-security-card">
+          <LockKeyhole size={20} />
+
+          <div>
+            <strong>
+              Demo environment
+            </strong>
+
+            <p>
+              Current investment activity uses
+              the configured demo/test system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="nx-demo-notice">
+        <Info size={17} />
+
+        <div>
+          <strong>
+            Demo investment notice
+          </strong>
+
+          <p>
+            Rates and projected returns shown
+            in Nexora are demonstration values
+            and are not promises of financial
+            returns.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

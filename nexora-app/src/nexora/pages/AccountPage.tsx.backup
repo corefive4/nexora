@@ -1,0 +1,356 @@
+import {
+  Bell,
+  ChevronRight,
+  CircleHelp,
+  FileText,
+  LockKeyhole,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  UserRound,
+  WalletCards,
+} from "lucide-react";
+import type {
+  Page,
+  ToastType,
+  UserProfile,
+  Wallet,
+} from "../types";
+import {
+  formatDateTime,
+  money,
+  truncateAddress,
+} from "../theme";
+import {
+  BalanceCard,
+  MenuItem,
+  SectionTitle,
+} from "../ui";
+
+type AccountPageProps = {
+  profile?: UserProfile | null;
+  wallet?: Wallet | null;
+  onNavigate: (page: Page) => void;
+  onLogout?: () => void;
+  onToast?: (
+    message: string,
+    type?: ToastType,
+  ) => void;
+};
+
+type LocalMenuItem = {
+  id:
+    | "profile"
+    | "wallet"
+    | "investments"
+    | "security"
+    | "support";
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  action?: () => void;
+};
+
+function getDisplayName(
+  profile?: UserProfile | null,
+): string {
+  if (!profile) {
+    return "Nexora User";
+  }
+
+  if (profile.displayName) {
+    return profile.displayName;
+  }
+
+  const fullName = [
+    profile.firstName,
+    profile.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return (
+    fullName ||
+    profile.username ||
+    "Nexora User"
+  );
+}
+
+export default function AccountPage({
+  profile,
+  wallet,
+  onNavigate,
+  onLogout,
+  onToast,
+}: AccountPageProps) {
+  const displayName =
+    getDisplayName(profile);
+
+  const username = profile?.username
+    ? `@${profile.username}`
+    : "Telegram account";
+
+  const balance =
+    wallet?.availableBalance ??
+    wallet?.balance ??
+    0;
+
+  const currency =
+    wallet?.currency ?? "USDT";
+
+  const menuItems: LocalMenuItem[] = [
+    {
+      id: "profile",
+      label: "Profile",
+      description:
+        "Manage your personal details",
+      icon: <UserRound size={19} />,
+      action: () =>
+        onToast?.(
+          "Profile settings are available in the demo.",
+          "info",
+        ),
+    },
+    {
+      id: "wallet",
+      label: "Wallet",
+      description:
+        "View your wallet and deposit address",
+      icon: <WalletCards size={19} />,
+      action: () =>
+        onToast?.(
+          "Wallet management is connected to the demo backend.",
+          "info",
+        ),
+    },
+    {
+      id: "investments",
+      label: "Investments",
+      description:
+        "View your active investment plans",
+      icon: <ShieldCheck size={19} />,
+      action: () =>
+        onNavigate("invest"),
+    },
+    {
+      id: "security",
+      label: "Security",
+      description:
+        "Account and session security",
+      icon: <LockKeyhole size={19} />,
+      action: () =>
+        onToast?.(
+          "Security controls will be expanded in the next backend phase.",
+          "info",
+        ),
+    },
+    {
+      id: "support",
+      label: "Support",
+      description:
+        "Get help with your Nexora account",
+      icon: <CircleHelp size={19} />,
+      action: () =>
+        onToast?.(
+          "Support center is currently in demo mode.",
+          "info",
+        ),
+    },
+  ];
+
+  return (
+    <div className="nx-page nx-account-page">
+      <section className="nx-account-profile">
+        <div className="nx-avatar nx-avatar--large">
+          {profile?.photoUrl ? (
+            <img
+              src={profile.photoUrl}
+              alt={displayName}
+            />
+          ) : (
+            <UserRound size={30} />
+          )}
+        </div>
+
+        <div className="nx-account-profile__content">
+          <span className="nx-eyebrow">
+            NEXORA ACCOUNT
+          </span>
+
+          <h1>{displayName}</h1>
+
+          <p>{username}</p>
+        </div>
+      </section>
+
+      <section className="nx-account-balance">
+        <BalanceCard
+          label="Available balance"
+          amount={balance}
+          currency={currency}
+          icon={<WalletCards size={19} />}
+          subtitle={
+            wallet?.updatedAt
+              ? `Updated ${formatDateTime(
+                  wallet.updatedAt,
+                )}`
+              : "Demo wallet"
+          }
+        />
+      </section>
+
+      <section className="nx-account-section">
+        <SectionTitle
+          title="Account"
+          description="Manage your Nexora account"
+        />
+
+        <div className="nx-menu-list">
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.id}
+              icon={item.icon}
+              title={item.label}
+              description={item.description}
+              trailing={
+                <ChevronRight size={18} />
+              }
+              onClick={item.action}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="nx-account-section">
+        <SectionTitle
+          title="Preferences"
+          description="Demo application settings"
+        />
+
+        <div className="nx-menu-list">
+          <MenuItem
+            icon={<Bell size={19} />}
+            title="Notifications"
+            description="Investment and account alerts"
+            trailing={
+              <span className="nx-menu-badge">
+                On
+              </span>
+            }
+            onClick={() =>
+              onToast?.(
+                "Notifications are enabled for the demo.",
+                "success",
+              )
+            }
+          />
+
+          <MenuItem
+            icon={<Settings size={19} />}
+            title="App settings"
+            description="Interface and application preferences"
+            trailing={
+              <ChevronRight size={18} />
+            }
+            onClick={() =>
+              onToast?.(
+                "More settings will be added later.",
+                "info",
+              )
+            }
+          />
+        </div>
+      </section>
+
+      <section className="nx-account-section">
+        <SectionTitle
+          title="Legal"
+          description="Important Nexora information"
+        />
+
+        <div className="nx-menu-list">
+          <MenuItem
+            icon={<FileText size={19} />}
+            title="Terms & conditions"
+            description="Read the platform terms"
+            trailing={
+              <ChevronRight size={18} />
+            }
+            onClick={() =>
+              onToast?.(
+                "Terms are currently presented as demo content.",
+                "info",
+              )
+            }
+          />
+
+          <MenuItem
+            icon={<ShieldCheck size={19} />}
+            title="Privacy & security"
+            description="How account information is handled"
+            trailing={
+              <ChevronRight size={18} />
+            }
+            onClick={() =>
+              onToast?.(
+                "Privacy information will be finalized before production launch.",
+                "info",
+              )
+            }
+          />
+        </div>
+      </section>
+
+      <section className="nx-account-wallet-preview">
+        <div>
+          <span className="nx-eyebrow">
+            WALLET
+          </span>
+
+          <h3>
+            {wallet?.address
+              ? truncateAddress(
+                  wallet.address,
+                  8,
+                  6,
+                )
+              : "No wallet address assigned"}
+          </h3>
+
+          <p>
+            {wallet?.network ??
+              "BSC Testnet"}{" "}
+            · {currency}
+          </p>
+        </div>
+
+        <strong>
+          {money(balance, currency)}
+        </strong>
+      </section>
+
+      <button
+        type="button"
+        className="nx-danger-button"
+        onClick={onLogout}
+      >
+        <LogOut size={18} />
+        <span>Log out</span>
+      </button>
+
+      <div className="nx-demo-notice">
+        <ShieldCheck size={17} />
+
+        <div>
+          <strong>Demo mode</strong>
+          <p>
+            Nexora is currently running with
+            test/demo wallet functionality.
+            Real customer funds are not enabled.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

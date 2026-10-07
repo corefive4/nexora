@@ -1,0 +1,1243 @@
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  authenticateTelegram,
+  createInvestment,
+  getInvestmentPlans,
+  getWallet,
+  getSessionToken,
+} from "./lib/nexora-api";
+import {
+  getTelegramInitData,
+  initTelegram,
+} from "./lib/telegram";
+
+type Page =
+  | "home"
+  | "invest"
+  | "earn"
+  | "friends"
+  | "account";
+
+type Wallet = {
+  id: string;
+  available_balance: number;
+  locked_balance: number;
+  currency: string;
+};
+
+type InvestmentPlan = {
+  id: string;
+  name: string;
+  min_amount: number;
+  max_amount: number | null;
+  return_rate: number;
+  duration_days: number;
+  currency: string;
+  is_active: boolean;
+};
+
+const fallbackPlans: InvestmentPlan[] = [
+  {
+    id: "starter",
+    name: "Starter",
+    min_amount: 10,
+    max_amount: 99,
+    return_rate: 1.2,
+    duration_days: 30,
+    currency: "USDT",
+    is_active: true,
+  },
+  {
+    id: "growth",
+    name: "Growth",
+    min_amount: 100,
+    max_amount: 499,
+    return_rate: 2.4,
+    duration_days: 30,
+    currency: "USDT",
+    is_active: true,
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    min_amount: 500,
+    max_amount: 1999,
+    return_rate: 3.1,
+    duration_days: 30,
+    currency: "USDT",
+    is_active: true,
+  },
+  {
+    id: "elite",
+    name: "Elite",
+    min_amount: 2000,
+    max_amount: null,
+    return_rate: 4,
+    duration_days: 30,
+    currency: "USDT",
+    is_active: true,
+  },
+];
+
+function money(value: number) {
+  return `$${value.toFixed(2)}`;
+}
+
+function formatRange(plan: InvestmentPlan) {
+  if (plan.max_amount === null) {
+    return `${money(plan.min_amount)}+`;
+  }
+
+  return `${money(plan.min_amount)}–${money(
+    plan.max_amount,
+  )}`;
+}
+
+function Icon({
+  name,
+}: {
+  name:
+    | "home"
+    | "chart"
+    | "gift"
+    | "users"
+    | "user"
+    | "arrow"
+    | "plus"
+    | "lock"
+    | "check";
+}) {
+  const paths: Record<string, string> = {
+    home:
+      "M3 10.5 12 3l9 7.5M5.5 9v11h13V9M9 20v-6h6v6",
+    chart:
+      "M4 19V5M4 19h16M8 16v-4M12 16V8M16 16V5",
+    gift:
+      "M3 8h18v13H3zM2 5h20v3H2zM12 5v16M12 5c-4 0-6-1-6-3 0-1.2 1-2 2.2-2C10.5 0 12 5 12 5Zm0 0c4 0 6-1 6-3 0-1.2-1-2-2.2-2C13.5 0 12 5 12 5Z",
+    users:
+      "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8-1a3 3 0 1 0-1-5.8M22 21v-2a4 4 0 0 0-3-3.9",
+    user:
+      "M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z",
+    arrow:
+      "M5 12h14M13 6l6 6-6 6",
+    plus:
+      "M12 5v14M5 12h14",
+    lock:
+      "M6 10V7a6 6 0 0 1 12 0v3M5 10h14v11H5z",
+    check:
+      "m5 12 4 4L19 6",
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={paths[name]} />
+    </svg>
+  );
+}
+
+
+function BalanceCard({
+  wallet,
+}: {
+  wallet: Wallet | null;
+}) {
+  const available = wallet?.available_balance ?? 0;
+  const locked = wallet?.locked_balance ?? 0;
+
+  return (
+    <motion.div
+      className="balance-card"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+    >
+      <div className="balance-card-top">
+        <span>Total Balance</span>
+        <span className="status-pill">
+          <span className="status-dot" />
+          Live
+        </span>
+      </div>
+
+      <div className="balance-value">
+        {money(available + locked)}
+      </div>
+
+      <div className="balance-meta">
+        <div>
+          <span>Available</span>
+          <strong>{money(available)}</strong>
+        </div>
+
+        <div>
+          <span>Invested</span>
+          <strong>{money(locked)}</strong>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function SectionTitle({
+  title,
+  action,
+  onAction,
+}: {
+  title: string;
+  action?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="section-title">
+      <h2>{title}</h2>
+
+      {action && onAction ? (
+        <button
+          className="text-button"
+          onClick={onAction}
+        >
+          {action}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function HomePage({
+  wallet,
+  plans,
+  onDeposit,
+  onInvest,
+}: {
+  wallet: Wallet | null;
+  plans: InvestmentPlan[];
+  onDeposit: () => void;
+  onInvest: () => void;
+}) {
+  const featuredPlan = plans[1] ?? plans[0];
+
+  return (
+    <motion.div
+      className="page home-page"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.45 }}
+    >
+      <motion.div
+        className="hero"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+      >
+        <motion.div
+          className="hero-orb"
+          animate={{
+            scale: [1, 1.08, 1],
+            rotate: [0, 8, 0],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <div className="hero-orb-core">N</div>
+        </motion.div>
+
+        <div className="hero-kicker">NEXORA</div>
+
+        <h1>Grow Together</h1>
+
+        <p>
+          Build your portfolio with simple, transparent investment plans.
+        </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.12, duration: 0.55 }}
+      >
+        <BalanceCard wallet={wallet} />
+      </motion.div>
+
+      <motion.div
+        className="quick-actions"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.22, duration: 0.5 }}
+      >
+        <button
+          className="quick-action"
+          onClick={onDeposit}
+        >
+          <span>＋</span>
+          Deposit
+        </button>
+
+        <button
+          className="quick-action primary"
+          onClick={onInvest}
+        >
+          <span>↗</span>
+          Invest
+        </button>
+      </motion.div>
+
+      <SectionTitle
+        title="Featured Plan"
+        action="View all"
+        onAction={onInvest}
+      />
+
+      {featuredPlan && (
+        <motion.button
+          className="plan-card featured"
+          onClick={onInvest}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.32, duration: 0.55 }}
+        >
+          <div className="plan-card-top">
+            <div>
+              <div className="plan-name">
+                {featuredPlan.name}
+              </div>
+
+              <div className="plan-range">
+                {formatRange(featuredPlan)}
+              </div>
+            </div>
+
+            <div className="plan-return">
+              {Number(featuredPlan.return_rate).toFixed(1)}%
+            </div>
+          </div>
+
+          <div className="plan-card-bottom">
+            <span>
+              {featuredPlan.duration_days} days
+            </span>
+
+            <span>Expected return</span>
+          </div>
+        </motion.button>
+      )}
+
+      <motion.div
+        className="info-card"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.42, duration: 0.5 }}
+      >
+        <div className="info-icon">✓</div>
+
+        <div>
+          <strong>Secure by design</strong>
+
+          <p>
+            Your account and investment actions are protected by Nexora's backend.
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="invite-card"
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.52, duration: 0.5 }}
+      >
+        <div className="invite-label">
+          INVITE &amp; EARN
+        </div>
+
+        <h3>Grow your network</h3>
+
+        <p>
+          Invite friends and unlock referral rewards as Nexora grows.
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function InvestPage({
+  plans,
+  wallet,
+  onCreated,
+}: {
+  plans: InvestmentPlan[];
+  wallet: Wallet | null;
+  onCreated: () => Promise<void>;
+}) {
+  const [selectedPlan, setSelectedPlan] =
+    useState<InvestmentPlan | null>(null);
+
+  const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const numericAmount = Number(amount);
+
+  const validAmount =
+    Number.isFinite(numericAmount) &&
+    numericAmount > 0 &&
+    selectedPlan !== null &&
+    numericAmount >= selectedPlan.min_amount &&
+    (selectedPlan.max_amount === null ||
+      numericAmount <= selectedPlan.max_amount);
+
+  async function handleSubmit() {
+    if (!selectedPlan || !validAmount) {
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await createInvestment(
+        selectedPlan.id,
+        numericAmount,
+      );
+
+      setMessage(
+        "Investment created successfully.",
+      );
+
+      setAmount("");
+
+      await onCreated();
+
+      setTimeout(() => {
+        setSelectedPlan(null);
+        setMessage("");
+      }, 1200);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to create investment.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="page">
+      <div className="page-heading">
+        <span className="eyebrow">INVEST</span>
+        <h1>Choose your plan</h1>
+        <p>
+          Select a plan that matches the amount
+          you want to invest.
+        </p>
+      </div>
+
+      <div className="available-card">
+        <span>Available balance</span>
+        <strong>
+          {money(
+            wallet?.available_balance ?? 0,
+          )}
+        </strong>
+      </div>
+
+      <div className="plans-list">
+        {plans.map((plan, index) => (
+          <motion.button
+            key={plan.id}
+            className={`plan-card ${
+              index === 1 ? "featured" : ""
+            }`}
+            whileTap={{ scale: 0.985 }}
+            onClick={() => {
+              setSelectedPlan(plan);
+              setAmount(
+                String(plan.min_amount),
+              );
+              setMessage("");
+            }}
+          >
+            <div className="plan-card-head">
+              <div>
+                <span className="plan-label">
+                  {plan.name}
+                </span>
+                <h3>
+                  {plan.return_rate}% return
+                </h3>
+              </div>
+
+              <span className="plan-arrow">
+                <Icon name="arrow" />
+              </span>
+            </div>
+
+            <div className="plan-details">
+              <span>
+                {formatRange(plan)}
+              </span>
+              <span>
+                {plan.duration_days} days
+              </span>
+              <span>{plan.currency}</span>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
+      {selectedPlan ? (
+        <div className="modal-backdrop">
+          <motion.div
+            className="modal-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="modal-header">
+              <div>
+                <span className="eyebrow">
+                  {selectedPlan.name}
+                </span>
+                <h2>
+                  Start your investment
+                </h2>
+              </div>
+
+              <button
+                className="close-button"
+                onClick={() =>
+                  setSelectedPlan(null)
+                }
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-plan-summary">
+              <div>
+                <span>Return</span>
+                <strong>
+                  {selectedPlan.return_rate}%
+                </strong>
+              </div>
+
+              <div>
+                <span>Duration</span>
+                <strong>
+                  {selectedPlan.duration_days}d
+                </strong>
+              </div>
+
+              <div>
+                <span>Range</span>
+                <strong>
+                  {formatRange(selectedPlan)}
+                </strong>
+              </div>
+            </div>
+
+            <label className="field">
+              <span>Investment amount</span>
+
+              <div className="amount-input">
+                <span>$</span>
+                <input
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={(event) =>
+                    setAmount(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="0.00"
+                />
+              </div>
+            </label>
+
+            <p className="field-hint">
+              Minimum{" "}
+              {money(selectedPlan.min_amount)}
+              {selectedPlan.max_amount !== null
+                ? ` · Maximum ${money(
+                    selectedPlan.max_amount,
+                  )}`
+                : ""}
+            </p>
+
+            {numericAmount > 0 &&
+            Number.isFinite(numericAmount) ? (
+              <div className="return-preview">
+                <span>Expected return</span>
+                <strong>
+                  {money(
+                    numericAmount +
+                      (numericAmount *
+                        selectedPlan.return_rate) /
+                        100,
+                  )}
+                </strong>
+              </div>
+            ) : null}
+
+            {message ? (
+              <div
+                className={`message ${
+                  message.includes("successfully")
+                    ? "success"
+                    : "error"
+                }`}
+              >
+                {message}
+              </div>
+            ) : null}
+
+            <button
+              className="primary-button"
+              disabled={
+                loading || !validAmount
+              }
+              onClick={handleSubmit}
+            >
+              {loading
+                ? "Processing..."
+                : "Confirm investment"}
+            </button>
+
+            <p className="demo-note">
+              Demo mode only. No real funds are
+              transferred.
+            </p>
+          </motion.div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function EarnPage() {
+  const activities = [
+    {
+      title: "Daily check-in",
+      reward: "0.10 USDT",
+      description:
+        "Check in every day to earn a small reward.",
+    },
+    {
+      title: "Invite a friend",
+      reward: "Referral reward",
+      description:
+        "Share Nexora with friends and grow together.",
+    },
+    {
+      title: "Complete your profile",
+      reward: "Coming soon",
+      description:
+        "More earning activities will be added here.",
+    },
+  ];
+
+  return (
+    <div className="page">
+      <div className="page-heading">
+        <span className="eyebrow">EARN</span>
+        <h1>Earn with Nexora</h1>
+        <p>
+          Complete simple activities and grow
+          together with the community.
+        </p>
+      </div>
+
+      <div className="earn-total">
+        <div>
+          <span>Total earned</span>
+          <strong>$0.00</strong>
+        </div>
+
+        <div className="earn-icon">
+          <Icon name="gift" />
+        </div>
+      </div>
+
+      <SectionTitle title="Activities" />
+
+      <div className="activity-list">
+        {activities.map((activity) => (
+          <div
+            className="activity-card"
+            key={activity.title}
+          >
+            <div className="activity-icon">
+              <Icon name="gift" />
+            </div>
+
+            <div className="activity-content">
+              <strong>
+                {activity.title}
+              </strong>
+              <p>{activity.description}</p>
+            </div>
+
+            <span className="activity-reward">
+              {activity.reward}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function FriendsPage() {
+  return (
+    <div className="page">
+      <div className="page-heading">
+        <span className="eyebrow">FRIENDS</span>
+        <h1>Grow together</h1>
+        <p>
+          Invite friends and build your Nexora
+          network.
+        </p>
+      </div>
+
+      <div className="referral-hero">
+        <div className="referral-icon">
+          <Icon name="users" />
+        </div>
+
+        <span className="eyebrow">
+          REFERRAL PROGRAM
+        </span>
+
+        <h2>Invite. Connect. Grow.</h2>
+
+        <p>
+          Your referral dashboard will show
+          invited users and rewards here.
+        </p>
+
+        <button
+          className="primary-button"
+          onClick={() => {
+            const text =
+              "Join me on Nexora — Grow Together!";
+            const url =
+              "https://t.me/NexoraGrowBot";
+
+            if (
+              navigator.share
+            ) {
+              navigator.share({
+                title: "Nexora",
+                text,
+                url,
+              }).catch(() => {});
+            } else {
+              navigator.clipboard
+                ?.writeText(
+                  `${text} ${url}`,
+                );
+            }
+          }}
+        >
+          Invite friends
+        </button>
+      </div>
+
+      <SectionTitle title="Referral levels" />
+
+      <div className="referral-levels">
+        <div className="referral-level">
+          <span className="level-number">
+            1
+          </span>
+          <div>
+            <strong>Level 1</strong>
+            <p>Direct referrals</p>
+          </div>
+          <span className="level-status">
+            Active
+          </span>
+        </div>
+
+        <div className="referral-level">
+          <span className="level-number">
+            2
+          </span>
+          <div>
+            <strong>Level 2</strong>
+            <p>Second-level network</p>
+          </div>
+          <span className="level-status muted">
+            Coming soon
+          </span>
+        </div>
+
+        <div className="referral-level">
+          <span className="level-number">
+            3
+          </span>
+          <div>
+            <strong>Level 3</strong>
+            <p>Extended network</p>
+          </div>
+          <span className="level-status muted">
+            Coming soon
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccountPage({
+  wallet,
+  sessionReady,
+}: {
+  wallet: Wallet | null;
+  sessionReady: boolean;
+}) {
+  return (
+    <div className="page">
+      <div className="account-header">
+        <div className="avatar">
+          N
+        </div>
+
+        <div>
+          <span className="eyebrow">
+            ACCOUNT
+          </span>
+          <h1>Nexora member</h1>
+          <p>
+            {sessionReady
+              ? "Telegram account connected"
+              : "Connecting..."}
+          </p>
+        </div>
+      </div>
+
+      <div className="account-balance">
+        <span>Wallet balance</span>
+        <strong>
+          {money(
+            (wallet?.available_balance ?? 0) +
+              (wallet?.locked_balance ?? 0),
+          )}
+        </strong>
+      </div>
+
+      <div className="settings-list">
+        <div className="setting-row">
+          <div className="setting-icon">
+            <Icon name="user" />
+          </div>
+
+          <div>
+            <strong>Profile</strong>
+            <p>
+              Your Telegram account
+            </p>
+          </div>
+
+          <Icon name="arrow" />
+        </div>
+
+        <div className="setting-row">
+          <div className="setting-icon">
+            <Icon name="lock" />
+          </div>
+
+          <div>
+            <strong>Security</strong>
+            <p>
+              Secure session and account
+              protection
+            </p>
+          </div>
+
+          <Icon name="arrow" />
+        </div>
+
+        <div className="setting-row">
+          <div className="setting-icon">
+            <Icon name="check" />
+          </div>
+
+          <div>
+            <strong>System status</strong>
+            <p>
+              Nexora backend connected
+            </p>
+          </div>
+
+          <span className="online-dot" />
+        </div>
+      </div>
+
+      <div className="demo-banner">
+        <strong>Demo environment</strong>
+        <p>
+          Investment and earning features are
+          currently for testing only. No real
+          funds are transferred.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function BottomNav({
+  page,
+  onChange,
+}: {
+  page: Page;
+  onChange: (page: Page) => void;
+}) {
+  const items: {
+    id: Page;
+    label: string;
+    icon:
+      | "home"
+      | "chart"
+      | "gift"
+      | "users"
+      | "user";
+  }[] = [
+    {
+      id: "home",
+      label: "Home",
+      icon: "home",
+    },
+    {
+      id: "invest",
+      label: "Invest",
+      icon: "chart",
+    },
+    {
+      id: "earn",
+      label: "Earn",
+      icon: "gift",
+    },
+    {
+      id: "friends",
+      label: "Friends",
+      icon: "users",
+    },
+    {
+      id: "account",
+      label: "Account",
+      icon: "user",
+    },
+  ];
+
+  return (
+    <nav className="bottom-nav">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          className={
+            page === item.id
+              ? "nav-item active"
+              : "nav-item"
+          }
+          onClick={() =>
+            onChange(item.id)
+          }
+        >
+          <span className="nav-icon">
+            <Icon name={item.icon} />
+          </span>
+          <span>{item.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+
+export default function App() {
+  const [page, setPage] =
+    useState<Page>("home");
+
+  const [wallet, setWallet] =
+    useState<Wallet | null>(null);
+
+  const [plans, setPlans] =
+    useState<InvestmentPlan[]>(
+      fallbackPlans,
+    );
+
+  const [connected, setConnected] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [toast, setToast] =
+    useState("");
+
+  const webApp = useMemo(
+    () => initTelegram(),
+    [],
+  );
+
+  async function refreshWallet() {
+    const current =
+      await getWallet();
+
+    setWallet(current);
+  }
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function start() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const initData =
+          getTelegramInitData();
+
+        if (!getSessionToken()) {
+          if (!initData) {
+            throw new Error(
+              "Open Nexora from Telegram to continue.",
+            );
+          }
+
+          await authenticateTelegram(
+            initData,
+          );
+        }
+
+        const [currentWallet, currentPlans] =
+          await Promise.all([
+            getWallet(),
+            getInvestmentPlans(),
+          ]);
+
+        if (!mounted) {
+          return;
+        }
+
+        setWallet(currentWallet);
+
+        if (currentPlans.length > 0) {
+          setPlans(currentPlans);
+        }
+
+        setConnected(true);
+      } catch (err) {
+        if (!mounted) {
+          return;
+        }
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to connect to Nexora.",
+        );
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void start();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  function showDepositMessage() {
+    setToast(
+      "Deposit flow is coming next. Demo mode is active.",
+    );
+
+    window.setTimeout(() => {
+      setToast("");
+    }, 3000);
+  }
+
+  async function handleInvestmentCreated() {
+    await refreshWallet();
+
+    setToast(
+      "Investment created successfully.",
+    );
+
+    window.setTimeout(() => {
+      setToast("");
+    }, 3000);
+  }
+
+  function renderPage() {
+    if (page === "home") {
+      return (
+        <HomePage
+          wallet={wallet}
+          plans={plans}
+          onInvest={() =>
+            setPage("invest")
+          }
+          onDeposit={
+            showDepositMessage
+          }
+        />
+      );
+    }
+
+    if (page === "invest") {
+      return (
+        <InvestPage
+          plans={plans}
+          wallet={wallet}
+          onCreated={
+            handleInvestmentCreated
+          }
+        />
+      );
+    }
+
+    if (page === "earn") {
+      return <EarnPage />;
+    }
+
+    if (page === "friends") {
+      return <FriendsPage />;
+    }
+
+    return (
+      <AccountPage
+        wallet={wallet}
+        sessionReady={connected}
+      />
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="app-shell loading-screen">
+        <div className="loading-logo">
+          <span>N</span>
+        </div>
+
+        <h1>Nexora</h1>
+        <p>Grow Together</p>
+
+        <div className="loading-line">
+          <span />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="app-shell error-screen">
+        <div className="error-card">
+          <div className="error-logo">
+            N
+          </div>
+
+          <span className="eyebrow">
+            NEXORA
+          </span>
+
+          <h1>Connection required</h1>
+
+          <p>{error}</p>
+
+          <button
+            className="primary-button"
+            onClick={() =>
+              window.location.reload()
+            }
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="brand">
+          <div className="brand-mark">
+            N
+          </div>
+
+          <div>
+            <strong>Nexora</strong>
+            <span>
+              Grow Together
+            </span>
+          </div>
+        </div>
+
+        <div
+          className={
+            connected
+              ? "connection-status"
+              : "connection-status offline"
+          }
+        >
+          <span />
+          {connected
+            ? "Connected"
+            : "Offline"}
+        </div>
+      </header>
+
+      <main>{renderPage()}</main>
+
+      <BottomNav
+        page={page}
+        onChange={setPage}
+      />
+
+      {toast ? (
+        <motion.div
+          className="toast"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+        >
+          {toast}
+        </motion.div>
+      ) : null}
+
+      {webApp ? null : (
+        <div className="browser-note">
+          Telegram Mini App mode
+        </div>
+      )}
+    </div>
+  );
+}
+

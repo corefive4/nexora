@@ -1,0 +1,1281 @@
+/* ============================================================
+   NEXORA HOME — PREMIUM DASHBOARD
+   ============================================================ */
+
+.nx-home {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #050812;
+  color: #f5f8ff;
+}
+
+.nx-home-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(61, 130, 246, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 28%,
+      rgba(139, 108, 255, 0.08),
+      transparent 28%
+    ),
+    #050812;
+}
+
+.nx-home-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image:
+    linear-gradient(
+      rgba(100, 140, 200, 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(100, 140, 200, 0.045) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    rgba(0, 0, 0, 0.7) 45%,
+    transparent 92%
+  );
+}
+
+.nx-home-orb {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: nx-home-float 13s ease-in-out infinite;
+}
+
+.nx-home-orb-a {
+  width: 270px;
+  height: 270px;
+  top: -140px;
+  right: -90px;
+  background: rgba(61, 130, 246, 0.18);
+}
+
+.nx-home-orb-b {
+  width: 210px;
+  height: 210px;
+  top: 38%;
+  left: -150px;
+  background: rgba(184, 245, 42, 0.055);
+  animation-delay: -4s;
+}
+
+.nx-home-orb-c {
+  width: 240px;
+  height: 240px;
+  bottom: 4%;
+  right: -150px;
+  background: rgba(139, 108, 255, 0.09);
+  animation-delay: -8s;
+}
+
+@keyframes nx-home-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -20px, 0);
+  }
+}
+
+/* ------------------------------------------------------------
+   SHELL
+   ------------------------------------------------------------ */
+
+.nx-home-shell {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 620px);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding:
+    max(18px, env(safe-area-inset-top))
+    16px
+    108px;
+}
+
+/* ------------------------------------------------------------
+   HEADER
+   ------------------------------------------------------------ */
+
+.nx-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.nx-home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nx-home-logo {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(84, 163, 255, 0.38);
+  border-radius: 13px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(84, 163, 255, 0.24),
+      rgba(61, 130, 246, 0.06)
+    );
+  color: #65adff;
+  font-size: 19px;
+  font-weight: 900;
+  box-shadow:
+    0 0 28px rgba(61, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.nx-home-brand strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.nx-home-brand small {
+  display: block;
+  margin-top: 3px;
+  color: #667691;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.nx-home-account {
+  position: relative;
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(146, 170, 211, 0.14);
+  border-radius: 14px;
+  background: rgba(17, 27, 45, 0.68);
+  color: #9caac0;
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+}
+
+.nx-account-icon {
+  font-size: 18px;
+}
+
+.nx-account-status {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b8f52a;
+  box-shadow: 0 0 10px rgba(184, 245, 42, 0.8);
+}
+
+/* ------------------------------------------------------------
+   HERO
+   ------------------------------------------------------------ */
+
+.nx-home-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.nx-home-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #6499df;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.nx-home-eyebrow i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #b8f52a;
+  box-shadow: 0 0 10px rgba(184, 245, 42, 0.8);
+}
+
+.nx-home-hero h1 {
+  margin: 10px 0 0;
+  color: #f6f9ff;
+  font-size: clamp(36px, 10vw, 52px);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+}
+
+.nx-home-hero h1 em {
+  color: #54a3ff;
+  font-style: normal;
+  text-shadow: 0 0 30px rgba(84, 163, 255, 0.2);
+}
+
+.nx-home-hero p {
+  max-width: 270px;
+  margin: 11px 0 0;
+  color: #71809a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.nx-live-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(184, 245, 42, 0.18);
+  border-radius: 999px;
+  background: rgba(184, 245, 42, 0.055);
+  color: #b8f52a;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.nx-live-pill i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #b8f52a;
+  box-shadow: 0 0 9px #b8f52a;
+}
+
+/* ------------------------------------------------------------
+   PORTFOLIO CARD
+   ------------------------------------------------------------ */
+
+.nx-portfolio-card {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  padding: 21px 20px 17px;
+  border: 1px solid rgba(84, 163, 255, 0.18);
+  border-radius: 27px;
+  background:
+    radial-gradient(
+      circle at 80% 12%,
+      rgba(84, 163, 255, 0.17),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(20, 34, 57, 0.96),
+      rgba(8, 14, 26, 0.96)
+    );
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.42),
+    0 0 45px rgba(61, 130, 246, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.nx-portfolio-shine {
+  position: absolute;
+  width: 260px;
+  height: 150px;
+  top: -120px;
+  right: -60px;
+  border-radius: 50%;
+  background: rgba(84, 163, 255, 0.18);
+  filter: blur(45px);
+}
+
+.nx-portfolio-heading {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.nx-portfolio-heading span:first-child {
+  display: block;
+  color: #9eacc1;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.nx-portfolio-heading small {
+  display: block;
+  margin-top: 4px;
+  color: #5e6e87;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.nx-secure-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #7990ad;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.nx-secure-badge i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #72e85d;
+  box-shadow: 0 0 9px rgba(114, 232, 93, 0.65);
+}
+
+.nx-portfolio-total {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 8px;
+  color: #fff;
+  font-size: clamp(34px, 10vw, 47px);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.nx-profit-line {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.nx-profit-line span {
+  color: #75e964;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.nx-profit-line span b {
+  font-size: 13px;
+}
+
+.nx-profit-line small {
+  color: #63738c;
+  font-size: 8px;
+}
+
+.nx-portfolio-chart {
+  position: absolute;
+  right: 0;
+  bottom: 62px;
+  left: 0;
+  height: 104px;
+  opacity: 0.95;
+}
+
+.nx-portfolio-chart svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.nx-chart-area {
+  fill: url(#nxHomeArea);
+}
+
+.nx-chart-line {
+  fill: none;
+  stroke: #54a3ff;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 7px rgba(84, 163, 255, 0.5));
+}
+
+.nx-portfolio-chart circle {
+  fill: #b8f52a;
+  filter: drop-shadow(0 0 7px rgba(184, 245, 42, 0.8));
+}
+
+.nx-portfolio-stats {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  left: 20px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.nx-portfolio-stats div {
+  min-width: 0;
+  padding: 9px 8px;
+  border: 1px solid rgba(146, 170, 211, 0.08);
+  border-radius: 11px;
+  background: rgba(2, 7, 15, 0.4);
+}
+
+.nx-portfolio-stats small {
+  display: block;
+  overflow: hidden;
+  color: #60708a;
+  font-size: 6.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nx-portfolio-stats strong {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #dbe5f5;
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------
+   QUICK ACTIONS
+   ------------------------------------------------------------ */
+
+.nx-home-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 11px;
+}
+
+.nx-home-action {
+  position: relative;
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 34px 1fr 18px;
+  align-items: center;
+  gap: 9px;
+  overflow: hidden;
+  padding: 11px;
+  border: 1px solid rgba(146, 170, 211, 0.11);
+  border-radius: 19px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nx-home-action::after {
+  content: "";
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  top: -55px;
+  right: -30px;
+  border-radius: 50%;
+  filter: blur(25px);
+}
+
+.nx-home-action-primary {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(61, 130, 246, 0.25),
+      rgba(20, 32, 53, 0.82)
+    );
+}
+
+.nx-home-action-primary::after {
+  background: rgba(84, 163, 255, 0.2);
+}
+
+.nx-home-action-secondary {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(184, 245, 42, 0.12),
+      rgba(18, 28, 43, 0.86)
+    );
+}
+
+.nx-home-action-secondary::after {
+  background: rgba(184, 245, 42, 0.08);
+}
+
+.nx-action-symbol {
+  position: relative;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #79b8ff;
+  font-size: 17px;
+}
+
+.nx-home-action-secondary .nx-action-symbol {
+  color: #b8f52a;
+}
+
+.nx-home-action span:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.nx-home-action small {
+  display: block;
+  color: #65758e;
+  font-size: 6.5px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.nx-home-action strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.nx-home-action > b {
+  position: relative;
+  z-index: 1;
+  color: #64748c;
+  font-size: 15px;
+}
+
+/* ------------------------------------------------------------
+   SECTIONS
+   ------------------------------------------------------------ */
+
+.nx-home-section {
+  margin-top: 31px;
+}
+
+.nx-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.nx-section-head > div > span {
+  color: #4f7eae;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.nx-section-head h2 {
+  margin: 4px 0 0;
+  color: #eaf1fc;
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.nx-section-head button {
+  border: 0;
+  padding: 0 0 2px;
+  background: transparent;
+  color: #6c9ed7;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nx-section-head button b {
+  margin-left: 3px;
+}
+
+/* ------------------------------------------------------------
+   FEATURED PLAN
+   ------------------------------------------------------------ */
+
+.nx-featured-plan {
+  position: relative;
+  width: 100%;
+  min-height: 178px;
+  overflow: hidden;
+  padding: 17px;
+  border: 1px solid rgba(184, 245, 42, 0.15);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(184, 245, 42, 0.12),
+      transparent 32%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(20, 31, 47, 0.98),
+      rgba(11, 18, 29, 0.96)
+    );
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(184, 245, 42, 0.035);
+}
+
+.nx-featured-glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  top: -100px;
+  right: -40px;
+  border-radius: 50%;
+  background: rgba(184, 245, 42, 0.15);
+  filter: blur(35px);
+}
+
+.nx-featured-top,
+.nx-featured-main,
+.nx-featured-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.nx-featured-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nx-featured-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(184, 245, 42, 0.16);
+  border-radius: 11px;
+  background: rgba(184, 245, 42, 0.07);
+  color: #b8f52a;
+  font-size: 16px;
+}
+
+.nx-popular-tag {
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(184, 245, 42, 0.18);
+  border-radius: 999px;
+  background: rgba(184, 245, 42, 0.07);
+  color: #b8f52a;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.nx-featured-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.nx-featured-main small,
+.nx-plan-range small {
+  display: block;
+  color: #687891;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.nx-featured-main strong {
+  display: block;
+  margin-top: 3px;
+  color: #f4f8ff;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+}
+
+.nx-featured-main strong i {
+  color: #b8f52a;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.nx-plan-range {
+  text-align: right;
+}
+
+.nx-plan-range strong {
+  margin-top: 4px;
+  color: #bdc8d9;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.nx-featured-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 17px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(146, 170, 211, 0.08);
+  color: #71819a;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.nx-featured-footer b {
+  color: #b8f52a;
+  font-size: 14px;
+}
+
+/* =========================================================
+   ACTIVE INVESTMENTS
+   ========================================================= */
+
+.nx-active-section {
+  margin-top: 28px;
+}
+
+.nx-active-list {
+  display: grid;
+  gap: 12px;
+}
+
+.nx-active-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(8,18,39,.78);
+  box-shadow: 0 12px 35px rgba(0,0,0,.16);
+  overflow: hidden;
+}
+
+.nx-active-card::after {
+  content: "";
+  position: absolute;
+  right: -35px;
+  top: -45px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(38,184,255,.08);
+  filter: blur(25px);
+  pointer-events: none;
+}
+
+.nx-active-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #b8f52a;
+  background: linear-gradient(135deg, rgba(184,245,42,.16), rgba(38,184,255,.08));
+  border: 1px solid rgba(184,245,42,.12);
+  font-size: 19px;
+}
+
+.nx-active-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-active-name {
+  margin: 0 0 4px;
+  color: #f4f8ff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.2px;
+}
+
+.nx-active-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #8290aa;
+  font-size: 11px;
+}
+
+.nx-active-amount {
+  margin-left: auto;
+  text-align: right;
+}
+
+.nx-active-value {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.nx-active-profit {
+  margin-top: 3px;
+  color: #b8f52a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   EARN BANNER
+   ========================================================= */
+
+.nx-earn-banner {
+  position: relative;
+  margin-top: 28px;
+  padding: 19px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(151,91,255,.22);
+  background:
+    radial-gradient(circle at 90% 20%, rgba(184,245,42,.13), transparent 34%),
+    radial-gradient(circle at 15% 100%, rgba(72,115,255,.20), transparent 45%),
+    linear-gradient(135deg, rgba(35,30,72,.92), rgba(11,20,43,.94));
+  box-shadow: 0 18px 45px rgba(0,0,0,.2);
+}
+
+.nx-earn-banner::before {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  right: -40px;
+  bottom: -65px;
+  border-radius: 50%;
+  border: 1px solid rgba(184,245,42,.15);
+  box-shadow:
+    0 0 0 18px rgba(184,245,42,.025),
+    0 0 0 38px rgba(184,245,42,.018);
+}
+
+.nx-earn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nx-earn-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: #b8f52a;
+  background: rgba(184,245,42,.11);
+  border: 1px solid rgba(184,245,42,.14);
+  font-size: 21px;
+}
+
+.nx-earn-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-earn-label {
+  margin: 0 0 4px;
+  color: #b8f52a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.nx-earn-title {
+  margin: 0;
+  color: #f7f9ff;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.nx-earn-subtitle {
+  margin: 4px 0 0;
+  color: #8995ad;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.nx-earn-arrow {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* =========================================================
+   RECENT ACTIVITY
+   ========================================================= */
+
+.nx-activity-section {
+  margin-top: 28px;
+}
+
+.nx-activity-list {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 21px;
+  background: rgba(255,255,255,.025);
+}
+
+.nx-activity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(8,17,36,.72);
+}
+
+.nx-activity-row + .nx-activity-row {
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+
+.nx-activity-icon {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(38,184,255,.08);
+  color: #5dd0ff;
+  border: 1px solid rgba(38,184,255,.1);
+  font-size: 16px;
+}
+
+.nx-activity-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-activity-title {
+  margin: 0;
+  color: #eaf0fa;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.nx-activity-time {
+  margin-top: 4px;
+  color: #69778f;
+  font-size: 10px;
+}
+
+.nx-activity-value {
+  color: #b8f52a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.nx-activity-value.is-negative {
+  color: #ff8394;
+}
+
+/* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+.nx-security-note {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(184,245,42,.09);
+  background: rgba(184,245,42,.035);
+}
+
+.nx-security-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #b8f52a;
+  background: rgba(184,245,42,.08);
+}
+
+.nx-security-title {
+  margin: 0 0 3px;
+  color: #dce7f5;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.nx-security-text {
+  margin: 0;
+  color: #718099;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
+
+.nx-home-empty {
+  padding: 25px 18px;
+  text-align: center;
+  border: 1px dashed rgba(255,255,255,.08);
+  border-radius: 20px;
+  background: rgba(255,255,255,.018);
+}
+
+.nx-home-empty-icon {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #6f819d;
+  background: rgba(255,255,255,.035);
+}
+
+.nx-home-empty-title {
+  margin: 0;
+  color: #dbe4f1;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.nx-home-empty-text {
+  margin: 5px auto 0;
+  max-width: 250px;
+  color: #68768e;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BOTTOM NAV
+   ========================================================= */
+
+.nx-bottom-nav {
+  position: sticky;
+  bottom: 10px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  margin: 32px 0 8px;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 22px;
+  background: rgba(5,13,29,.88);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow:
+    0 15px 45px rgba(0,0,0,.34),
+    inset 0 1px rgba(255,255,255,.025);
+}
+
+.nx-nav-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 50px;
+  padding: 6px 3px;
+  border: 0;
+  border-radius: 15px;
+  color: #62718b;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    color .2s ease,
+    background .2s ease,
+    transform .2s ease;
+}
+
+.nx-nav-item:hover {
+  color: #b6c4d8;
+  background: rgba(255,255,255,.035);
+}
+
+.nx-nav-item:active {
+  transform: scale(.96);
+}
+
+.nx-nav-item.is-active {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(38,184,255,.12),
+    rgba(184,245,42,.07)
+  );
+}
+
+.nx-nav-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.nx-nav-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (min-width: 640px) {
+  .nx-home-shell {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .nx-home-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .nx-home-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nx-featured-plan {
+    padding: 22px;
+  }
+
+  .nx-bottom-nav {
+    bottom: 18px;
+  }
+}
+
+@media (min-width: 900px) {
+  .nx-home-shell {
+    max-width: 980px;
+  }
+
+  .nx-home-main-grid {
+    display: grid;
+    grid-template-columns: 1.25fr .75fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .nx-home-main-grid > * {
+    margin-top: 0;
+  }
+
+  .nx-home-content {
+    padding-bottom: 35px;
+  }
+
+  .nx-bottom-nav {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY / MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-home,
+  .nx-home *,
+  .nx-nav-item {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .nx-home-shell {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .nx-home-title {
+    font-size: 29px;
+  }
+
+  .nx-portfolio-card {
+    padding: 18px;
+  }
+
+  .nx-balance-value {
+    font-size: 26px;
+  }
+
+  .nx-home-actions {
+    gap: 8px;
+  }
+
+  .nx-home-action {
+    padding: 13px 8px;
+  }
+
+  .nx-bottom-nav {
+    margin-left: -1px;
+    margin-right: -1px;
+  }
+}

@@ -1,0 +1,832 @@
+import {
+  ArrowDownToLine,
+  ArrowUpRight,
+  Check,
+  Copy,
+  Home,
+  Users,
+  Wallet,
+  X,
+  Zap,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
+import {
+  authenticateTelegram,
+  createInvestment,
+  getDepositAddress,
+  getInvestmentPlans,
+  getWallet,
+} from "./lib/nexora-api";
+
+import {
+  getTelegramInitData,
+  initTelegram,
+} from "./lib/telegram";
+
+import AccountPage from "./nexora/pages/AccountPage";
+import EarnPage from "./nexora/pages/EarnPage";
+import FriendsPage from "./nexora/pages/FriendsPage";
+import HomePage from "./nexora/pages/HomePage";
+import InvestPage from "./nexora/pages/InvestPage";
+
+import type {
+  Activity,
+  EarnTask,
+  Investment,
+  InvestmentPlan,
+  Page,
+  ReferralLevel,
+  ReferralStats,
+  Toast,
+  Wallet as WalletType,
+} from "./nexora/types";
+
+import { money } from "./nexora/theme";
+
+type NavItem = {
+  id: Page;
+  label: string;
+  icon: typeof Home;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    id: "home",
+    label: "Home",
+    icon: Home,
+  },
+  {
+    id: "invest",
+    label: "Invest",
+    icon: Zap,
+  },
+  {
+    id: "earn",
+    label: "Earn",
+    icon: Wallet,
+  },
+  {
+    id: "friends",
+    label: "Friends",
+    icon: Users,
+  },
+  {
+    id: "account",
+    label: "Account",
+    icon: Wallet,
+  },
+];
+
+const EMPTY_WALLET: WalletType = {
+  available_balance: 0,
+  invested_balance: 0,
+  total_profit: 0,
+  currency: "USDT",
+};
+
+const DEFAULT_REFERRAL_STATS: ReferralStats = {
+  total: 0,
+  active: 0,
+  earnings: 0,
+  level1: 0,
+  level2: 0,
+  level3: 0,
+};
+
+const DEFAULT_REFERRAL_LEVELS: ReferralLevel[] = [
+  {
+    level: 1,
+    percentage: 5,
+    members: 0,
+    earnings: 0,
+  },
+  {
+    level: 2,
+    percentage: 2,
+    members: 0,
+    earnings: 0,
+  },
+  {
+    level: 3,
+    percentage: 1,
+    members: 0,
+    earnings: 0,
+  },
+];
+
+function createDemoActivities(
+  wallet: WalletType,
+): Activity[] {
+  const now = new Date();
+
+  const activities: Activity[] = [];
+
+  if (
+    wallet.available_balance > 0
+  ) {
+    activities.push({
+      id: "wallet-available",
+      type: "deposit",
+      amount:
+        wallet.available_balance,
+      description:
+        "Available wallet balance",
+      created_at:
+        now.toISOString(),
+    });
+  }
+
+  if (
+    wallet.invested_balance > 0
+  ) {
+    activities.push({
+      id: "wallet-invested",
+      type: "investment",
+      amount:
+        wallet.invested_balance,
+      description:
+        "Current invested balance",
+      created_at:
+        new Date(
+          now.getTime() -
+            3600000,
+        ).toISOString(),
+    });
+  }
+
+  if (
+    wallet.total_profit > 0
+  ) {
+    activities.push({
+      id: "wallet-profit",
+      type: "earning",
+      amount:
+        wallet.total_profit,
+      description:
+        "Recorded portfolio profit",
+      created_at:
+        new Date(
+          now.getTime() -
+            7200000,
+        ).toISOString(),
+    });
+  }
+
+  return activities;
+}
+
+export default function App() {
+  const [page, setPage] =
+    useState<Page>("home");
+
+  const [wallet, setWallet] =
+    useState<WalletType>(
+      EMPTY_WALLET,
+    );
+
+  const [plans, setPlans] =
+    useState<InvestmentPlan[]>(
+      [],
+    );
+
+  const [investments, setInvestments] =
+    useState<Investment[]>([]);
+
+  const [activities, setActivities] =
+    useState<Activity[]>([]);
+
+  const [referralStats] =
+    useState<ReferralStats>(
+      DEFAULT_REFERRAL_STATS,
+    );
+
+  const [referralLevels] =
+    useState<ReferralLevel[]>(
+      DEFAULT_REFERRAL_LEVELS,
+    );
+
+  const [toast, setToast] =
+    useState<Toast | null>(
+      null,
+    );
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [depositOpen, setDepositOpen] =
+    useState(false);
+
+  const [depositAddress, setDepositAddress] =
+    useState("");
+
+  const [depositLoading, setDepositLoading] =
+    useState(false);
+
+  const [copied, setCopied] =
+    useState(false);
+
+  const [authReady, setAuthReady] =
+    useState(false);
+
+  const totalBalance = useMemo(
+    () =>
+      Math.max(
+        0,
+        Number(
+          wallet.available_balance,
+        ) || 0,
+      ) +
+      Math.max(
+        0,
+        Number(
+          wallet.invested_balance,
+        ) || 0,
+      ),
+    [wallet],
+  );
+
+  useEffect(() => {
+    initTelegram();
+
+    async function bootstrap() {
+      try {
+        setLoading(true);
+
+        const initData =
+          getTelegramInitData();
+
+        if (initData) {
+          await authenticateTelegram(
+            initData,
+          );
+
+          setAuthReady(true);
+        } else {
+          setAuthReady(true);
+        }
+
+        const [
+          walletResult,
+          plansResult,
+        ] = await Promise.all([
+          getWallet(),
+          getInvestmentPlans(),
+        ]);
+
+        setWallet(
+          walletResult ?? EMPTY_WALLET,
+        );
+
+        setPlans(
+          Array.isArray(
+            plansResult,
+          )
+            ? plansResult
+            : [],
+        );
+
+        setActivities(
+          createDemoActivities(
+            walletResult ??
+              EMPTY_WALLET,
+          ),
+        );
+      } catch (error) {
+        console.error(
+          "Nexora bootstrap failed:",
+          error,
+        );
+
+        setToast({
+          type: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Unable to load Nexora.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    bootstrap();
+  }, []);
+
+  useEffect(() => {
+    if (!toast) {
+      return;
+    }
+
+    const timer =
+      window.setTimeout(
+        () => {
+          setToast(null);
+        },
+        3500,
+      );
+
+    return () =>
+      window.clearTimeout(
+        timer,
+      );
+  }, [toast]);
+
+  async function refreshWallet() {
+    try {
+      const nextWallet =
+        await getWallet();
+
+      if (nextWallet) {
+        setWallet(nextWallet);
+
+        setActivities(
+          createDemoActivities(
+            nextWallet,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Wallet refresh failed:",
+        error,
+      );
+    }
+  }
+
+  async function handleInvestment(
+    planId: string,
+    amount: number,
+  ) {
+    const plan =
+      plans.find(
+        (item) =>
+          item.id === planId,
+      ) ?? null;
+
+    if (!plan) {
+      throw new Error(
+        "Investment plan not found.",
+      );
+    }
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+      throw new Error(
+        "Enter a valid investment amount.",
+      );
+    }
+
+    try {
+      const result =
+        await createInvestment(
+          plan.id,
+          amount,
+        );
+
+      const investment =
+        result?.investment ??
+        result;
+
+      if (
+        investment &&
+        typeof investment ===
+          "object"
+      ) {
+        setInvestments(
+          (current) => [
+            investment as Investment,
+            ...current,
+          ],
+        );
+      }
+
+      await refreshWallet();
+
+      setToast({
+        type: "success",
+        message:
+          "Investment created successfully.",
+      });
+
+      setPage("invest");
+    } catch (error) {
+      setToast({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to create investment.",
+      });
+
+      throw error;
+    }
+  }
+
+  async function openDeposit() {
+    setDepositOpen(true);
+    setCopied(false);
+    setDepositAddress("");
+
+    try {
+      setDepositLoading(true);
+
+      const result =
+        await getDepositAddress();
+
+      setDepositAddress(
+        result?.address ?? "",
+      );
+    } catch (error) {
+      setToast({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to load deposit address.",
+      });
+    } finally {
+      setDepositLoading(false);
+    }
+  }
+
+  async function copyDepositAddress() {
+    if (!depositAddress) {
+      return;
+    }
+
+    try {
+      if (
+        navigator.clipboard &&
+        window.isSecureContext
+      ) {
+        await navigator.clipboard.writeText(
+          depositAddress,
+        );
+      } else {
+        const textarea =
+          document.createElement(
+            "textarea",
+          );
+
+        textarea.value =
+          depositAddress;
+
+        textarea.style.position =
+          "fixed";
+        textarea.style.opacity =
+          "0";
+
+        document.body.appendChild(
+          textarea,
+        );
+
+        textarea.focus();
+        textarea.select();
+
+        document.execCommand(
+          "copy",
+        );
+
+        textarea.remove();
+      }
+
+      setCopied(true);
+
+      window.setTimeout(
+        () => {
+          setCopied(false);
+        },
+        1800,
+      );
+    } catch {
+      setToast({
+        type: "error",
+        message:
+          "Unable to copy the address.",
+      });
+    }
+  }
+
+  async function handleEarnClaim(
+    task: EarnTask,
+  ) {
+    if (
+      !task.completed ||
+      task.claimed
+    ) {
+      return;
+    }
+
+    setToast({
+      type: "info",
+      message:
+        "Reward claims are currently in demo mode.",
+    });
+  }
+
+  function renderPage() {
+    if (loading) {
+      return (
+        <div className="loading-page">
+          <div className="loading-mark">
+            N
+          </div>
+
+          <div className="loading-title">
+            NEXORA
+          </div>
+
+          <div className="loading-copy">
+            Loading your workspace…
+          </div>
+        </div>
+      );
+    }
+
+    switch (page) {
+      case "invest":
+        return (
+          <InvestPage
+            wallet={wallet}
+            plans={plans}
+            investments={
+              investments
+            }
+            onInvest={
+              handleInvestment
+            }
+          />
+        );
+
+      case "earn":
+        return (
+          <EarnPage
+            onClaim={
+              handleEarnClaim
+            }
+          />
+        );
+
+      case "friends":
+        return (
+          <FriendsPage
+            referralStats={
+              referralStats
+            }
+            referralLevels={
+              referralLevels
+            }
+          />
+        );
+
+      case "account":
+        return (
+          <AccountPage
+            wallet={wallet}
+          />
+        );
+
+      case "home":
+      default:
+        return (
+          <HomePage
+            wallet={wallet}
+            plans={plans}
+            investments={
+              investments
+            }
+            activities={
+              activities
+            }
+            onDeposit={
+              openDeposit
+            }
+            onInvest={() =>
+              setPage("invest")
+            }
+          />
+        );
+    }
+  }
+
+  return (
+    <div className="app-shell">
+      <main className="app-content">
+        {renderPage()}
+      </main>
+
+      <nav className="bottom-nav">
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+
+          const active =
+            page === item.id;
+
+          return (
+            <button
+              type="button"
+              key={item.id}
+              className={
+                active
+                  ? "nav-item active"
+                  : "nav-item"
+              }
+              onClick={() =>
+                setPage(item.id)
+              }
+            >
+              <Icon size={18} />
+
+              <span>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {toast && (
+        <div
+          className={`toast toast-${toast.type}`}
+          role="status"
+        >
+          <div className="toast-icon">
+            {toast.type ===
+            "success" ? (
+              <Check size={15} />
+            ) : toast.type ===
+              "error" ? (
+              <X size={15} />
+            ) : (
+              <Zap size={15} />
+            )}
+          </div>
+
+          <span>
+            {toast.message}
+          </span>
+        </div>
+      )}
+
+      {depositOpen && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setDepositOpen(false);
+            }
+          }}
+        >
+          <section
+            className="deposit-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="deposit-title"
+          >
+            <div className="modal-header">
+              <div>
+                <div
+                  className="modal-kicker"
+                >
+                  ADD FUNDS
+                </div>
+
+                <h2
+                  id="deposit-title"
+                  className="modal-title"
+                >
+                  Deposit USDT
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="Close"
+                onClick={() =>
+                  setDepositOpen(
+                    false,
+                  )
+                }
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="deposit-network">
+              <div>
+                <span className="deposit-label">
+                  Network
+                </span>
+
+                <strong>
+                  BNB Smart Chain
+                </strong>
+              </div>
+
+              <div>
+                <span className="deposit-label">
+                  Asset
+                </span>
+
+                <strong>
+                  USDT
+                </strong>
+              </div>
+            </div>
+
+            <div className="deposit-address-box">
+              <div className="deposit-label">
+                Deposit address
+              </div>
+
+              {depositLoading ? (
+                <div className="deposit-loading">
+                  Loading address…
+                </div>
+              ) : depositAddress ? (
+                <>
+                  <div className="deposit-address">
+                    {depositAddress}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={
+                      copyDepositAddress
+                    }
+                  >
+                    {copied ? (
+                      <Check size={15} />
+                    ) : (
+                      <Copy size={15} />
+                    )}
+
+                    {copied
+                      ? "Copied"
+                      : "Copy address"}
+                  </button>
+                </>
+              ) : (
+                <div className="deposit-loading">
+                  No deposit address
+                  available.
+                </div>
+              )}
+            </div>
+
+            <div className="deposit-warning">
+              <ArrowDownToLine
+                size={16}
+              />
+
+              <p>
+                Send only USDT on the
+                displayed network. This
+                application is currently
+                using demo-mode deposit
+                infrastructure.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() =>
+                setDepositOpen(
+                  false,
+                )
+              }
+            >
+              Done
+              <ArrowUpRight
+                size={15}
+              />
+            </button>
+          </section>
+        </div>
+      )}
+
+      {!authReady && !loading && (
+        <div
+          className="auth-notice"
+          role="status"
+        >
+          Preparing Telegram session…
+        </div>
+      )}
+
+      <div className="portfolio-value-hidden">
+        {money(totalBalance)}
+      </div>
+    </div>
+  );
+}

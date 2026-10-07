@@ -1,0 +1,385 @@
+import {
+  ArrowRight,
+  Check,
+  Gift,
+  Info,
+  Sparkles,
+  Users,
+  UserRound,
+} from "lucide-react";
+import type {
+  EarnTask,
+  Page,
+  ToastType,
+  Wallet,
+} from "../types";
+import { money } from "../theme";
+import {
+  EmptyState,
+  FeatureIcon,
+  MenuItem,
+  SectionTitle,
+  StatCard,
+} from "../ui";
+
+type EarnPageProps = {
+  wallet: Wallet | null;
+  tasks?: EarnTask[];
+  onNavigate: (page: Page) => void;
+  onClaim?: (
+    taskId: string,
+  ) => Promise<boolean>;
+  onToast?: (
+    message: string,
+    type?: ToastType,
+  ) => void;
+};
+
+const DEFAULT_TASKS: EarnTask[] = [
+  {
+    id: "daily-checkin",
+    title: "Daily check-in",
+    description:
+      "Open Nexora and complete your daily activity.",
+    reward: 0.25,
+    currency: "USDT",
+    type: "daily",
+    completed: false,
+    claimed: false,
+    available: true,
+    actionLabel: "Claim",
+  },
+  {
+    id: "complete-profile",
+    title: "Complete your profile",
+    description:
+      "Keep your Nexora profile information complete.",
+    reward: 0.5,
+    currency: "USDT",
+    type: "profile",
+    completed: false,
+    claimed: false,
+    available: true,
+    actionLabel: "Claim",
+  },
+  {
+    id: "invite-friend",
+    title: "Invite a friend",
+    description:
+      "Share your referral link with a new user.",
+    reward: 1,
+    currency: "USDT",
+    type: "referral",
+    completed: false,
+    claimed: false,
+    available: true,
+    actionLabel: "Claim",
+  },
+];
+
+function getTaskIcon(
+  type: EarnTask["type"],
+) {
+  switch (type) {
+    case "referral":
+      return <Users size={19} />;
+
+    case "profile":
+      return <UserRound size={19} />;
+
+    case "social":
+      return <Sparkles size={19} />;
+
+    case "bonus":
+      return <Gift size={19} />;
+
+    default:
+      return <Check size={19} />;
+  }
+}
+
+export default function EarnPage({
+  wallet,
+  tasks,
+  onNavigate,
+  onClaim,
+  onToast,
+}: EarnPageProps) {
+  const resolvedTasks =
+    tasks && tasks.length > 0
+      ? tasks
+      : DEFAULT_TASKS;
+
+  const availableTasks =
+    resolvedTasks.filter(
+      (task) =>
+        task.available !== false &&
+        !task.claimed,
+    );
+
+  const claimedTasks =
+    resolvedTasks.filter(
+      (task) => task.claimed,
+    );
+
+  const availableRewards =
+    availableTasks.reduce(
+      (total, task) =>
+        total + Number(task.reward || 0),
+      0,
+    );
+
+  const claimedRewards =
+    claimedTasks.reduce(
+      (total, task) =>
+        total + Number(task.reward || 0),
+      0,
+    );
+
+  const currency =
+    wallet?.currency ?? "USDT";
+
+  const handleClaim = async (
+    task: EarnTask,
+  ) => {
+    if (!onClaim) {
+      onToast?.(
+        "Earn tasks are currently in demo mode.",
+        "info",
+      );
+      return;
+    }
+
+    const success =
+      await onClaim(task.id);
+
+    if (success) {
+      onToast?.(
+        `${money(
+          task.reward,
+          task.currency ?? currency,
+        )} reward claimed.`,
+        "success",
+      );
+    }
+  };
+
+  return (
+    <div className="nx-page nx-earn-page">
+      <section className="nx-earn-hero">
+        <div className="nx-earn-hero__icon">
+          <FeatureIcon
+            icon={<Gift size={25} />}
+            tone="accent"
+            size="lg"
+          />
+        </div>
+
+        <span className="nx-eyebrow">
+          NEXORA EARN
+        </span>
+
+        <h1>
+          Earn while you grow.
+        </h1>
+
+        <p>
+          Complete simple activities and
+          collect demo rewards inside Nexora.
+        </p>
+
+        <button
+          type="button"
+          className="nx-button nx-button--primary"
+          onClick={() =>
+            onNavigate("friends")
+          }
+        >
+          Invite friends
+          <ArrowRight size={17} />
+        </button>
+      </section>
+
+      <section>
+        <div className="nx-stats-grid nx-stats-grid--two">
+          <StatCard
+            label="Available rewards"
+            value={money(
+              availableRewards,
+              currency,
+            )}
+            icon={<Gift size={18} />}
+          />
+
+          <StatCard
+            label="Claimed rewards"
+            value={money(
+              claimedRewards,
+              currency,
+            )}
+            icon={<Check size={18} />}
+          />
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle
+          title="Available tasks"
+          description="Complete tasks to unlock demo rewards"
+        />
+
+        {availableTasks.length === 0 ? (
+          <EmptyState
+            icon={<Check size={25} />}
+            title="You're all caught up"
+            description="There are no new earn tasks available right now."
+            actionLabel="Invite friends"
+            onAction={() =>
+              onNavigate("friends")
+            }
+          />
+        ) : (
+          <div className="nx-earn-task-list">
+            {availableTasks.map(
+              (task) => (
+                <div
+                  key={task.id}
+                  className="nx-earn-task"
+                >
+                  <div className="nx-earn-task__icon">
+                    {getTaskIcon(task.type)}
+                  </div>
+
+                  <div className="nx-earn-task__content">
+                    <div className="nx-earn-task__title">
+                      <strong>
+                        {task.title}
+                      </strong>
+
+                      <span>
+                        +
+                        {money(
+                          task.reward,
+                          task.currency ??
+                            currency,
+                        )}
+                      </span>
+                    </div>
+
+                    <p>
+                      {task.description}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="nx-task-button"
+                    onClick={() =>
+                      void handleClaim(
+                        task,
+                      )
+                    }
+                    disabled={
+                      task.completed ===
+                        true &&
+                      task.claimed === true
+                    }
+                  >
+                    {task.actionLabel ??
+                      "Claim"}
+                  </button>
+                </div>
+              ),
+            )}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <SectionTitle
+          title="How earning works"
+          description="A simple demo reward flow"
+        />
+
+        <div className="nx-menu-list">
+          <MenuItem
+            icon={<Sparkles size={19} />}
+            title="Complete activities"
+            description="Finish eligible activities shown in your Earn page."
+          />
+
+          <MenuItem
+            icon={<Gift size={19} />}
+            title="Claim your reward"
+            description="Claim available demo rewards after completing a task."
+          />
+
+          <MenuItem
+            icon={<Users size={19} />}
+            title="Grow your network"
+            description="Referral activities can unlock additional demo rewards."
+          />
+        </div>
+      </section>
+
+      {claimedTasks.length > 0 ? (
+        <section>
+          <SectionTitle
+            title="Claimed"
+            description="Previously completed earn activities"
+          />
+
+          <div className="nx-earn-task-list">
+            {claimedTasks.map(
+              (task) => (
+                <div
+                  key={task.id}
+                  className="nx-earn-task is-claimed"
+                >
+                  <div className="nx-earn-task__icon">
+                    <Check size={19} />
+                  </div>
+
+                  <div className="nx-earn-task__content">
+                    <strong>
+                      {task.title}
+                    </strong>
+
+                    <p>
+                      Reward claimed ·{" "}
+                      {money(
+                        task.reward,
+                        task.currency ??
+                          currency,
+                      )}
+                    </p>
+                  </div>
+
+                  <span className="nx-task-complete">
+                    Done
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      ) : null}
+
+      <div className="nx-demo-notice">
+        <Info size={17} />
+
+        <div>
+          <strong>
+            Demo rewards only
+          </strong>
+
+          <p>
+            Earn balances shown here are
+            simulated and do not represent
+            real financial returns.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

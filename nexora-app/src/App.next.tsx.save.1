@@ -1,0 +1,375 @@
+import { useEffect, useState,
+} from "react";
+import { authenticateTelegram, 
+  createInvestment, 
+  getDepositAddress, 
+  getInvestmentPlans, getWallet, 
+  getSessionToken,
+} from "./lib/nexora-api";
+import { getTelegramInitData, 
+  initTelegram,
+} from "./lib/telegram";
+import type { Activity, 
+  Investment, InvestmentPlan, 
+  Page, Toast, Wallet,
+} from "./nexora/types";
+import HomePage from 
+"./nexora/pages/HomePage"; import 
+InvestPage from 
+"./nexora/pages/InvestPage"; 
+import EarnPage from 
+"./nexora/pages/EarnPage"; import 
+FriendsPage from 
+"./nexora/pages/FriendsPage"; 
+import AccountPage from 
+"./nexora/pages/AccountPage"; 
+import {
+  GiftIcon, TrendingUp, UserIcon, 
+  UsersIcon, WalletIcon,
+} from "./nexora/ui";
+import "./nexora.css"; const 
+emptyWallet: Wallet = {
+  available_balance: 0, 
+  invested_balance: 0, 
+  total_profit: 0, currency: 
+  "USDT",
+};
+const demoActivities: Activity[] = 
+[]; function App() {
+  const [page, setPage] = 
+    useState<Page>("home");
+  const [wallet, setWallet] = 
+    useState<Wallet>(emptyWallet);
+  const [plans, setPlans] = 
+    useState<InvestmentPlan[]>([]);
+  const [investments, 
+  setInvestments] =
+    useState<Investment[]>([]); 
+  const [activities] =
+    useState<Activity[]>(demoActivities); 
+  const [loading, setLoading] =
+    useState(true); const [error, 
+  setError] =
+    useState(""); const [toast, 
+  setToast] =
+    useState<Toast | null>(null); 
+  const [depositAddress, 
+  setDepositAddress] =
+    useState(""); const 
+  [showDeposit, setShowDeposit] =
+    useState(false); useEffect(() 
+  => {
+    initTelegram(); let mounted = 
+    true; async function load() {
+      try { setLoading(true); 
+        setError(""); const 
+        initData =
+          getTelegramInitData(); 
+        if (!getSessionToken()) {
+          if (!initData) { throw 
+            new Error(
+              "Open Nexora from 
+              Telegram to 
+              continue.",
+            );
+          }
+          await 
+          authenticateTelegram(
+            initData, );
+        }
+        const [ walletData, 
+          planData,
+        ] = await Promise.all([ 
+          getWallet(), 
+          getInvestmentPlans(),
+        ]); if (!mounted) return; 
+        setWallet({
+          available_balance: 
+            Number(
+              walletData?.available_balance, 
+            ) || 0,
+          invested_balance: 
+            Number(
+              walletData?.invested_balance, 
+            ) || 0,
+          total_profit: Number( 
+              walletData?.total_profit,
+            ) || 0, currency: 
+            walletData?.currency 
+            ?? "USDT",
+        });
+        setPlans(planData ?? []);
+      } catch (err) {
+        if (!mounted) return; 
+        setError(
+          err instanceof Error ? 
+            err.message
+            : "Unable to load 
+            : Nexora.",
+        );
+      } finally {
+        if (mounted) { 
+          setLoading(false);
+        }
+      }
+    }
+    void load(); return () => { 
+      mounted = false;
+    };
+  }, []);
+  function notify( message: 
+    string, type: Toast["type"] = 
+    "info",
+  ) { setToast({ message, type,
+    });
+    window.setTimeout(() => { 
+      setToast(null);
+    }, 3500);
+  }
+  async function openDeposit() { 
+    try {
+      const address = await 
+        getDepositAddress();
+      setDepositAddress(address); 
+      setShowDeposit(true);
+    } catch (err) {
+      notify( err instanceof Error 
+          ? err.message
+          : "Unable to load 
+          : deposit address.",
+        "error", );
+    }
+  }
+  async function handleInvestment( 
+    planId: string, amount: 
+    number,
+  ) { try { const result = await 
+        createInvestment(
+          planId, amount, ); const 
+      investment =
+        result?.investment; if 
+      (investment) {
+        setInvestments((current) 
+        => [
+          investment, ...current, 
+        ]);
+      }
+      setWallet((current) => ({ 
+        ...current, 
+        available_balance:
+          current.available_balance 
+          - amount,
+        invested_balance: 
+          current.invested_balance 
+          + amount,
+      }));
+      notify( "Investment created 
+        successfully.", "success",
+      ); setPage("home");
+    } catch (err) {
+      notify( err instanceof Error 
+          ? err.message
+          : "Investment failed.",
+        "error", ); throw err;
+    }
+  }
+  if (loading) { return ( <div 
+      className="nx-loading">
+        <div 
+        className="nx-loading-logo">
+          N </div> 
+        <strong>Nexora</strong> 
+        <span>Grow Together</span> 
+        <div 
+        className="nx-loading-bar">
+          <i /> </div> </div> );
+  }
+  if (error) { return ( <div 
+      className="nx-error-screen">
+        <div 
+        className="nx-error-logo">
+          N </div> <h1>Welcome to 
+        Nexora</h1> <p>{error}</p> 
+        <button
+          type="button" 
+          className="nx-primary-button" 
+          onClick={() =>
+            window.location.reload()
+          }
+        >
+          Try Again </button> 
+      </div>
+    );
+  }
+  return ( <div 
+    className="nx-app">
+      <main 
+      className="nx-content">
+        {page === "home" && ( 
+          <HomePage
+            wallet={wallet} 
+            plans={plans} 
+            investments={investments} 
+            activities={activities} 
+            onDeposit={openDeposit} 
+            onInvest={() =>
+              setPage("invest")
+            }
+            onOpenInvestments={() 
+            =>
+              setPage("invest")
+            }
+          /> )} {page === "invest" 
+        && (
+          <InvestPage 
+            wallet={wallet} 
+            plans={plans} 
+            investments={investments} 
+            onInvest={handleInvestment}
+          /> )} {page === "earn" 
+        && (
+          <EarnPage /> )} {page 
+        === "friends" && (
+          <FriendsPage /> )} {page 
+        === "account" && (
+          <AccountPage 
+            wallet={wallet}
+          /> )} </main> 
+      {showDeposit && (
+        <DepositModal 
+          address={depositAddress} 
+          onClose={() =>
+            setShowDeposit(false)
+          }
+        /> )} {toast && ( <div 
+          className={`nx-toast 
+          nx-toast-${toast.type}`} 
+          role="status"
+        >
+          {toast.message} </div> 
+      )} <BottomNav
+        page={page} 
+        onChange={setPage}
+      /> </div> );
+}
+function DepositModal({ address, 
+  onClose,
+}: {
+  address: string; onClose: () => 
+  void;
+}) {
+  return ( <div 
+      className="nx-modal-backdrop" 
+      onClick={onClose}
+    >
+      <div className="nx-modal" 
+        onClick={(event) =>
+          event.stopPropagation()
+        }
+      >
+        <div 
+        className="nx-modal-handle" 
+        /> <div 
+        className="nx-modal-header">
+          <div> 
+            <span>DEPOSIT</span> 
+            <h2>Fund your 
+            wallet</h2>
+          </div> <button 
+            type="button" 
+            onClick={onClose} 
+            className="nx-close-button"
+          >
+            × </button> </div> 
+        <div 
+        className="nx-network-pill">
+          <span 
+          className="nx-network-dot" 
+          /> BSC Testnet · USDT
+        </div> <p 
+        className="nx-modal-text">
+          Send USDT on the BNB 
+          Smart Chain network to 
+          the address below.
+        </p> <div 
+        className="nx-address-box">
+          <code>{address}</code> 
+        </div> <div 
+        className="nx-warning">
+          <strong>Important</strong> 
+          <span>
+            Only send USDT using 
+            the supported network. 
+            Sending another token 
+            or using another 
+            network may result in 
+            permanent loss.
+          </span> </div> <button 
+          type="button" 
+          className="nx-secondary-button 
+          nx-full-button" 
+          onClick={onClose}
+        >
+          Done </button> </div> 
+    </div>
+  );
+}
+function BottomNav({ page, 
+  onChange,
+}: {
+  page: Page; onChange: (page: 
+  Page) => void;
+}) {
+  const items: { id: Page; label: 
+    string; icon: React.ReactNode;
+  }[] = [
+    { id: "home", label: "Home", 
+      icon: <WalletIcon size={21} 
+      />,
+    },
+    { id: "invest", label: 
+      "Invest", icon: <TrendingUp 
+      size={21} />,
+    },
+    { id: "earn", label: "Earn", 
+      icon: <GiftIcon size={21} 
+      />,
+    },
+    { id: "friends", label: 
+      "Friends", icon: <UsersIcon 
+      size={21} />,
+    },
+    { id: "account", label: 
+      "Account", icon: <UserIcon 
+      size={21} />,
+    },
+  ]; return ( <nav 
+    className="nx-bottom-nav">
+      {items.map((item) => { const 
+        active =
+          item.id === page; return 
+        (
+          <button type="button" 
+            key={item.id} 
+            className={
+              active ? 
+                "nx-nav-item 
+                nx-nav-active"
+                : "nx-nav-item"
+            }
+            onClick={() => 
+              onChange(item.id)
+            }
+          >
+            <span 
+            className="nx-nav-icon">
+              {item.icon} </span> 
+            <span>
+              {item.label} </span> 
+          </button>
+        );
+      })}
+    </nav> );
+}
+export default App;
+

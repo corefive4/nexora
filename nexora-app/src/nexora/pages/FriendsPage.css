@@ -1,0 +1,693 @@
+.nx-friends {
+  --friends-bg: #050914;
+  --friends-blue: #22d3ee;
+  --friends-blue-2: #2563eb;
+  --friends-lime: #a3e635;
+  --friends-violet: #a78bfa;
+  --friends-text: #f4f8ff;
+  --friends-muted: #77869e;
+  --friends-line: rgba(130,154,190,.14);
+
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  padding-bottom: 105px;
+  color: var(--friends-text);
+  background:
+    radial-gradient(circle at 20% -10%, rgba(34,211,238,.14), transparent 35%),
+    var(--friends-bg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.nx-friends *,
+.nx-friends *::before,
+.nx-friends *::after {
+  box-sizing: border-box;
+}
+
+.nx-friends button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.nx-friends-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nx-friends-orb {
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  filter: blur(85px);
+  opacity: .13;
+  animation: nxFriendsFloat 12s ease-in-out infinite alternate;
+}
+
+.nx-friends-orb-a {
+  top: 100px;
+  left: -170px;
+  background: #22d3ee;
+}
+
+.nx-friends-orb-b {
+  top: 590px;
+  right: -180px;
+  background: #2563eb;
+  animation-delay: -4s;
+}
+
+.nx-friends-orb-c {
+  top: 1050px;
+  left: -170px;
+  background: #a78bfa;
+  animation-delay: -8s;
+}
+
+.nx-friends-grid {
+  position: absolute;
+  inset: 0;
+  opacity: .15;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+@keyframes nxFriendsFloat {
+  from { transform: translateY(-12px) scale(1); }
+  to { transform: translateY(35px) scale(1.1); }
+}
+
+.nx-friends-shell {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 720px);
+  margin: auto;
+  padding: 22px 17px 30px;
+}
+
+.nx-friends-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 23px;
+}
+
+.nx-friends-overline {
+  color: var(--friends-blue);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .2em;
+}
+
+.nx-friends-header h1 {
+  margin: 7px 0 0;
+  font-size: clamp(34px, 10vw, 48px);
+  line-height: .95;
+  letter-spacing: -.055em;
+}
+
+.nx-friends-header p {
+  margin: 8px 0 0;
+  color: #6f7e96;
+  font-size: 9px;
+}
+
+.nx-friends-account {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--friends-line);
+  border-radius: 14px;
+  background: rgba(11,21,39,.8);
+  color: var(--friends-blue);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.nx-referral-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 245px;
+  padding: 19px;
+  border: 1px solid rgba(34,211,238,.2);
+  border-radius: 25px;
+  background: linear-gradient(145deg, rgba(14,38,61,.95), rgba(7,15,29,.97));
+  box-shadow: 0 25px 70px rgba(0,0,0,.25);
+}
+
+.nx-referral-glow {
+  position: absolute;
+  width: 270px;
+  height: 200px;
+  right: -90px;
+  top: -80px;
+  border-radius: 50%;
+  background: rgba(34,211,238,.13);
+  filter: blur(55px);
+}
+
+.nx-referral-visual {
+  position: absolute;
+  right: -25px;
+  top: -20px;
+  width: 260px;
+  height: 260px;
+}
+
+.nx-network-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px solid rgba(34,211,238,.12);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.nx-ring-one {
+  width: 105px;
+  height: 105px;
+}
+
+.nx-ring-two {
+  width: 175px;
+  height: 175px;
+  border-color: rgba(34,211,238,.09);
+}
+
+.nx-ring-three {
+  width: 245px;
+  height: 245px;
+  border-color: rgba(167,139,250,.08);
+}
+
+.nx-network-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  transform: translate(-50%,-50%);
+  border: 1px solid rgba(34,211,238,.38);
+  border-radius: 18px;
+  background: rgba(14,38,61,.95);
+  color: var(--friends-blue);
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow:
+    0 0 25px rgba(34,211,238,.16),
+    inset 0 0 20px rgba(34,211,238,.06);
+}
+
+.nx-node {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(163,230,53,.2);
+  border-radius: 11px;
+  background: rgba(13,27,42,.95);
+  color: var(--friends-lime);
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: 0 0 20px rgba(163,230,53,.08);
+}
+
+.nx-node-one {
+  left: 31px;
+  top: 78px;
+}
+
+.nx-node-two {
+  right: 28px;
+  top: 48px;
+  color: var(--friends-blue);
+}
+
+.nx-node-three {
+  right: 18px;
+  bottom: 65px;
+  color: var(--friends-violet);
+}
+
+.nx-node-four {
+  left: 48px;
+  bottom: 42px;
+}
+
+.nx-referral-copy {
+  position: relative;
+  z-index: 2;
+  width: 58%;
+  margin-top: 10px;
+}
+
+.nx-referral-copy > span {
+  color: #71849e;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+.nx-referral-copy strong {
+  display: block;
+  margin-top: 11px;
+  font-size: clamp(24px, 7vw, 34px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+}
+
+.nx-referral-copy p {
+  max-width: 205px;
+  margin: 10px 0 0;
+  color: #6d7c94;
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+.nx-friend-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.nx-friend-stats > div {
+  padding: 12px 10px;
+  border: 1px solid var(--friends-line);
+  border-radius: 17px;
+  background: rgba(9,18,34,.7);
+}
+
+.nx-friend-stats span,
+.nx-friend-stats strong,
+.nx-friend-stats small {
+  display: block;
+}
+
+.nx-friend-stats span {
+  color: #62718a;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.nx-friend-stats strong {
+  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  letter-spacing: -.02em;
+}
+
+.nx-friend-stats small {
+  margin-top: 2px;
+  color: #5d6b82;
+  font-size: 7px;
+}
+
+.nx-friend-stats > div:nth-child(2) strong {
+  color: var(--friends-lime);
+}
+
+.nx-friends-section {
+  margin-top: 31px;
+}
+
+.nx-friends-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.nx-friends-section-head > div > span,
+.nx-network-count {
+  color: #62718a;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.nx-friends-section-head h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  letter-spacing: -.025em;
+}
+
+.nx-network-count {
+  color: var(--friends-blue);
+}
+
+.nx-how-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.nx-how-card {
+  position: relative;
+  min-height: 105px;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid var(--friends-line);
+  border-radius: 19px;
+  background: rgba(9,18,34,.72);
+}
+
+.nx-how-number {
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  color: #344156;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.nx-how-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: rgba(34,211,238,.07);
+  color: var(--friends-blue);
+  font-size: 14px;
+}
+
+.nx-how-card:nth-child(2) .nx-how-icon {
+  background: rgba(163,230,53,.07);
+  color: var(--friends-lime);
+}
+
+.nx-how-card:nth-child(3) .nx-how-icon {
+  background: rgba(167,139,250,.08);
+  color: var(--friends-violet);
+}
+
+.nx-how-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.nx-how-card p {
+  margin: 3px 0 0;
+  color: #66758c;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.nx-invite-card {
+  position: relative;
+  overflow: hidden;
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid rgba(163,230,53,.19);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(51,70,24,.32), rgba(8,18,32,.94));
+}
+
+.nx-invite-card::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -100px;
+  top: -80px;
+  border-radius: 50%;
+  background: rgba(163,230,53,.1);
+  filter: blur(35px);
+}
+
+.nx-invite-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-invite-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: rgba(163,230,53,.08);
+  color: var(--friends-lime);
+}
+
+.nx-invite-top > span {
+  color: #8aa75d;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.nx-invite-card h2 {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  font-size: 21px;
+  letter-spacing: -.035em;
+}
+
+.nx-invite-card > p {
+  position: relative;
+  z-index: 1;
+  max-width: 400px;
+  margin: 5px 0 15px;
+  color: #6a788f;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.nx-invite-button {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid rgba(163,230,53,.2);
+  border-radius: 14px;
+  background: rgba(163,230,53,.08);
+  color: var(--friends-lime);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.nx-invite-button b {
+  font-size: 15px;
+}
+
+.nx-friend-list {
+  overflow: hidden;
+  border: 1px solid var(--friends-line);
+  border-radius: 20px;
+  background: rgba(8,16,30,.68);
+}
+
+.nx-friend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+}
+
+.nx-friend-row + .nx-friend-row {
+  border-top: 1px solid rgba(255,255,255,.045);
+}
+
+.nx-friend-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(34,211,238,.14), rgba(37,99,235,.1));
+  color: var(--friends-blue);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.nx-friend-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.nx-friend-main strong,
+.nx-friend-main small,
+.nx-friend-reward strong,
+.nx-friend-reward small {
+  display: block;
+}
+
+.nx-friend-main strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+}
+
+.nx-friend-main small,
+.nx-friend-reward small {
+  margin-top: 3px;
+  color: #5f6e85;
+  font-size: 7px;
+}
+
+.nx-friend-reward {
+  text-align: right;
+}
+
+.nx-friend-reward strong {
+  color: var(--friends-lime);
+  font-size: 9px;
+}
+
+.nx-friends-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 18px;
+  border: 1px dashed var(--friends-line);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.nx-friends-empty > div {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: rgba(34,211,238,.08);
+  color: var(--friends-blue);
+  font-size: 21px;
+}
+
+.nx-friends-empty strong {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.nx-friends-empty p {
+  max-width: 260px;
+  margin: 4px 0 12px;
+  color: #64738a;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.nx-friends-empty button {
+  padding: 9px 13px;
+  border-radius: 11px;
+  background: rgba(34,211,238,.08);
+  color: var(--friends-blue);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.nx-friends-note {
+  display: flex;
+  gap: 9px;
+  margin: 27px 4px 0;
+  color: #526078;
+}
+
+.nx-friends-note > span {
+  color: var(--friends-violet);
+}
+
+.nx-friends-note strong,
+.nx-friends-note small {
+  display: block;
+}
+
+.nx-friends-note strong {
+  color: #6e7d94;
+  font-size: 8px;
+}
+
+.nx-friends-note small {
+  margin-top: 2px;
+  font-size: 7px;
+  line-height: 1.45;
+}
+
+.nx-friends-nav {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: 13px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: min(calc(100% - 24px), 520px);
+  min-height: 66px;
+  transform: translateX(-50%);
+  padding: 7px;
+  border: 1px solid rgba(121,146,183,.17);
+  border-radius: 22px;
+  background: rgba(5,10,21,.84);
+  box-shadow: 0 20px 55px rgba(0,0,0,.45);
+  backdrop-filter: blur(22px);
+}
+
+.nx-friends-nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #56647c;
+}
+
+.nx-friends-nav button span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.nx-friends-nav button small {
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.nx-friends-nav button.is-active {
+  color: var(--friends-blue);
+  background: rgba(34,211,238,.08);
+}
+
+@media (min-width: 700px) {
+  .nx-friends-shell {
+    padding-top: 30px;
+  }
+
+  .nx-how-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .nx-how-card {
+    min-height: 145px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-friends-orb {
+    animation: none;
+  }
+}
